@@ -1,0 +1,12 @@
+/*/*.log
+/*/logpipe.*.lnk
+/*/*.pkg.tar.xz
+/*/*.pkg.tar.zst
+/*/*.tar.bz2
+/*/*.tar.gz
+/*/*.zip
+# Folders to ignore
+/*/pkg/
+/*/src/
+/*/*-git/
+/packages/
