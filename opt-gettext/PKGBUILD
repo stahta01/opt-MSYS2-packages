@@ -2,13 +2,13 @@
 
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
-_use_static_libgcc=yes
+_use_static_libgcc=no
 
 _realname='gettext'
 pkgbase=opt-${_realname}
 pkgname=('opt-gettext' 'opt-gettext-devel' 'opt-libgettextpo' 'opt-libasprintf' 'opt-libintl')
 pkgver=0.22.5
-pkgrel=1
+pkgrel=2
 pkgdesc="GNU internationalization library"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/gettext/"
