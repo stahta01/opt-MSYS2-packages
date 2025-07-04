@@ -8,19 +8,22 @@
 # Contributor: Tim Stahlhut <stahta01@gmail.com>
 #
 ##
-# Set _enable_gcc_bootmode to yes in part 1
-# toolchain initial build order part 1: opt-zlib opt-binutils opt-gcc
-# Setting _enable_gcc_bootmode not used part 2A
-# toolchain initial build order part 2: opt-libiconv opt-gettext
-#
+# Set _enable_gcc_bootmode to yes in part 1A
+# Set _enable_static_libgcc/_use_static_libgcc to yes in part 1A
+# toolchain initial build order part 1A: opt-zlib opt-binutils opt-gcc
+# Set _use_static_libgcc to yes in part 2A
+# toolchain initial build order part 2A: opt-libiconv opt-gettext
 #   32 bits use opt-msys2-runtime-3.3-gcc13
-# toolchain initial build order part 3A: opt-msys2-runtime-gcc13
-# Set _enable_gcc_bootmode to no in part 3B and later
-# toolchain initial build order part 3B: opt-gcc opt-zlib opt-binutils
-# Setting _enable_gcc_bootmode not used part 4
-# Setting _use_opt_gettext_devel set to yes in opt-libiconv for part 4 and later
+# toolchain initial build order part 2B: opt-msys2-runtime-gcc13
+
+# Set _enable_gcc_bootmode to no in part 3 and later
+# Set _enable_static_libgcc/_use_static_libgcc to no in part 3 and later
+# toolchain initial build order part 3: opt-gcc opt-zlib opt-binutils
+# Set _use_opt_gettext_devel set to yes in opt-libiconv for part 4A and later
+# Set _use_static_libgcc to no in part 4A
+# toolchain initial build order part 4A: opt-libiconv opt-gettext
 #   32 bits use opt-msys2-runtime-3.3-gcc13
-# toolchain initial build order part 4: opt-libiconv opt-gettext opt-msys2-runtime-gcc13 opt-libtool
+# toolchain initial build order part 4B: opt-msys2-runtime-gcc13 opt-libtool
 
 #   32 bits use opt-msys2-runtime-3.3-gcc13
 # NOTE: updating opt-msys2-runtime-gcc13 requires starting at part 3
@@ -30,8 +33,9 @@
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 ### Major build options
-_enable_gcc_bootmode=yes    # Use no for production; yes to use normal GCC to build
+_enable_gcc_bootmode=yes   # Use no for production; yes to use normal GCC to build
 _enable_bootstrap=no       # Use yes for production
+_enable_static_libgcc=yes    # Use no for production
 options=('staticlibs' '!emptydirs' '!strip' '!debug')
 #options=('!emptydirs') # '!strip' 'debug')
 ### Language build options
@@ -44,7 +48,6 @@ _enable_jit=no
 _enable_libquadmath=no      # Use no for production
 _enable_libgomp=yes         # Use yes for production
 _enable_graphite=yes        # Use yes for production
-_enable_static_libgcc=no    # Use no for production
 _enable_lto=yes             # Use yes for production
 _enable_system_zlib=yes     # Use yes for production
 # =========================================== #
