@@ -3,7 +3,7 @@
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 _use_opt_gettext_devel=no
-_use_static_libgcc=yes
+_use_static_libgcc=no
 
 _realname='libiconv'
 pkgbase=opt-${_realname}
