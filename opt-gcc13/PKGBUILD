@@ -36,6 +36,7 @@ _install_prefix="/opt${MSYSTEM_PREFIX}"
 _enable_gcc_bootmode=yes   # Use no for production; yes to use normal GCC to build
 _enable_bootstrap=no       # Use yes for production
 _enable_static_libgcc=yes    # Use no for production
+_use_temp_dll_prefix=no     # Use no for production
 options=('staticlibs' '!emptydirs' '!strip' '!debug')
 #options=('!emptydirs') # '!strip' 'debug')
 ### Language build options
@@ -126,6 +127,7 @@ source=(http://gcc.gnu.org/pub/gcc/infrastructure/mpfr-${MPFR_VERSION}.tar.bz2
         0101-Cygwin-enable-libgccjit-not-just-for-MingW.patch
         0102-Cygwin-testsuite-fixes-for-libgccjit.patch
         0950-11.2.0-configure-msys2.patch
+        0951-11.2.0-msys2-spec-temp.patch
         0951-11.2.0-msys2-spec.patch)
 sha256sums=('feced2d430dd5a97805fa289fed3fc8ff2b094c02d05287fd6133e7f1f0ec926'
             'eae9326beb4158c386e39a356818031bd28f3124cf915f8c5b1dc4c7a36b4d7c'
@@ -146,6 +148,7 @@ sha256sums=('feced2d430dd5a97805fa289fed3fc8ff2b094c02d05287fd6133e7f1f0ec926'
             '9813ca6ab518d744dc36ab2e808804fcfedf1a5d7faa876e1a6fb06afb7a793a'
             '3707b0aab99b203cbd9e513be46c7d4600de06e6c8344160b7fb1779061d08da'
             '646b6e802e46f932fa793e0e9348c7c98064e46a9bac76f4ad258b66b2b3bba9'
+            '8a5c1b22de1328adf4c2a571fe30ef008a729504e13b77c9ad275cf3a9313e88'
             '82bc03f43fd7e103c1373433340d6654cbc771723db54430b18eff48a3935a45')
 
 # Helper macros to help make tasks easier #
@@ -244,9 +247,12 @@ prepare() {
     0102-Cygwin-testsuite-fixes-for-libgccjit.patch
 
   # MSYS2 Patches
-  apply_patch_with_msg \
-    0950-11.2.0-configure-msys2.patch \
-    0951-11.2.0-msys2-spec.patch
+  apply_patch_with_msg 0950-11.2.0-configure-msys2.patch
+  if [ "$_use_temp_dll_prefix" == "yes" ]; then
+    apply_patch_with_msg 0951-11.2.0-msys2-spec-temp.patch
+  else
+    apply_patch_with_msg 0951-11.2.0-msys2-spec.patch
+  fi
 
   # Do not run fixincludes
   #sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
