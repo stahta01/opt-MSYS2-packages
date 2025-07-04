@@ -3,6 +3,7 @@
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 _enable_gcc_bootmode=yes
+_use_static_libgcc=yes
 
 _realname=binutils
 pkgbase=opt-${_realname}
@@ -60,6 +61,10 @@ build() {
     export PATH="/opt/usr/bin:$PATH"
     export CC=/opt/usr/bin/gcc.exe
     export CXX=/opt/usr/bin/g++.exe
+  fi
+
+  if [[ "$_use_static_libgcc" == "yes" ]]; then
+    export LDFLAGS+=" -static-libgcc -static-libstdc++"
   fi
 
   echo ""
