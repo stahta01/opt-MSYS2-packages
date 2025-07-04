@@ -2,8 +2,8 @@
 
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
-_enable_gcc_bootmode=yes
-_use_static_libgcc=yes
+_enable_gcc_bootmode=no
+_use_static_libgcc=no
 
 _realname=binutils
 pkgbase=opt-${_realname}
