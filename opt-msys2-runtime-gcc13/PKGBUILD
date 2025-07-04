@@ -153,7 +153,10 @@ prepare() {
     /usr/bin/git reset --hard
   fi
   del_file_exists winsup/cygwin/msys2_path_conv.cc \
-    winsup/cygwin/msys2_path_conv.h
+    winsup/cygwin/msys2_path_conv.h \
+    winsup/utils/mingw/getprocaddr.c \
+    winsup/cygwin/include/cygwin/exit_process.h \
+    winsup/cygwin/fhandler_dev_fd.cc
 
  apply_git_am_with_msg 0001-Add-MSYS2-triplet.patch \
   0002-Fix-msys-library-name-in-import-libraries.patch \
