@@ -397,8 +397,8 @@ build() {
     --with-system-zlib \
     --enable-linker-build-id \
     --enable-libstdcxx-filesystem-ts \
-    --with-pkgversion="Rev${pkgrel} ${MSYSTEM} ${MSYSTEM_CARCH}, Built by m6809-dev project" \
-    --with-bugurl="https://github.com/stahta01/m6809-dev/issues" \
+    --with-pkgversion="Rev${pkgrel} ${MSYSTEM} ${MSYSTEM_CARCH}, Built by opt-MSYS2-packages project" \
+    --with-bugurl="https://github.com/stahta01/opt-MSYS2-packages/issues" \
     "${extra_config[@]}"
 
   make
