@@ -3,6 +3,7 @@
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 _use_opt_gettext_devel=no
+_use_static_libgcc=yes
 
 _realname='libiconv'
 pkgbase=opt-${_realname}
@@ -87,7 +88,10 @@ check() {
 }
 
 package_opt-libiconv() {
-  depends=('opt-gcc-libs' 'libintl')
+  depends=('libintl')
+  if [[ "$_use_static_libgcc" != "yes" ]]; then
+    depends+=('opt-gcc-libs')
+  fi
 
   mkdir -p ${pkgdir}${_install_prefix}
   cp -rf ${srcdir}/dest${_install_prefix}/bin ${pkgdir}${_install_prefix}
