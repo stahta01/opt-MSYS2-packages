@@ -3,6 +3,7 @@
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 _enable_gcc_bootmode=yes
+_use_static_libgcc=yes
 
 _realname=zlib
 pkgbase=opt-${_realname}
@@ -88,7 +89,7 @@ check() {
 package_opt-zlib() {
 if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
   depends=('gcc-libs')
-else
+elif [[ "$_use_static_libgcc" != "yes" ]]; then
   depends=('opt-gcc-libs')
 fi
 
