@@ -3,13 +3,13 @@
 
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
-_use_temp_dll_prefix=yes
+_use_temp_dll_prefix=both
 
 _realname=msys2-runtime
 pkgbase=opt-${_realname}
 pkgname=('opt-msys2-runtime' 'opt-msys2-runtime-devel')
 pkgver=3.6.3
-pkgrel=1
+pkgrel=2
 pkgdesc="Cygwin POSIX emulation engine"
 arch=('x86_64')
 url="https://www.cygwin.com/"
