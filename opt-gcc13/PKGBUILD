@@ -32,6 +32,7 @@
 # Set _use_temp_dll_prefix=no in 3B and later
 # toolchain initial build order part 3B: opt-gcc
 # toolchain initial build order part 3C: opt-zlib opt-binutils
+# Set _use_opt_gettext_devel to yes for opt-libiconv in 3D and later
 # toolchain initial build order part 3D: opt-libiconv opt-gettext
 # IV.   Final build Mode
 #   32 bits use opt-msys2-runtime-3.3-gcc13
