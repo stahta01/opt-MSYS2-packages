@@ -162,6 +162,7 @@ prepare() {
     winsup/cygwin/include/cygwin/exit_process.h \
     winsup/cygwin/fhandler_dev_fd.cc
 
+  git revert winsup/cygwin/Makefile.am
   if [ "$_use_temp_dll_prefix" != "no" ]; then
     apply_git_am_with_msg 0003-Rename-dll-from-cygwin-to-temp-msys.patch
   else
