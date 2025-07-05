@@ -3,6 +3,14 @@
 
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
+_use_temp_dll_prefix=yes
+
+if [ "$_use_temp_dll_prefix" == "yes" ]; then
+  _DLL_BASENAME=temp-msys-2.0
+else
+  _DLL_BASENAME=msys-2.0
+fi
+
 _realname=msys2-runtime
 pkgbase=opt-${_realname}
 pkgname=('opt-msys2-runtime' 'opt-msys2-runtime-devel')
@@ -35,6 +43,7 @@ source=('msys2-runtime'::git://sourceware.org/git/newlib-cygwin.git#tag=cygwin-$
         msys2-runtime.commit
         0001-Add-MSYS2-triplet.patch
         0002-Fix-msys-library-name-in-import-libraries.patch
+        0003-Rename-dll-from-cygwin-to-temp-msys.patch
         0003-Rename-dll-from-cygwin-to-msys.patch
         0004-Add-functionality-for-converting-UNIX-paths-in-argum.patch
         0005-Add-functionality-for-changing-OS-name-via-MSYSTEM-e.patch
@@ -78,6 +87,7 @@ sha256sums=('dd3cb54af2f8828d6857a3a595b02b09b23209570e0cc44342f4c9826845fb63'
             'eea82d3aac8b57ab34acf1e7dbb6e916f1bdc5106199379517adf2cf5edfd2ab'
             '5538db757661949423563bab5e4f383dfa4ef0cf3301cf43f23b482392554b3b'
             '2fb9b2b297797d20cd901eaee2de735e8cdda1c1e5836e9ff77856c0d1216860'
+            'c314b0605439f69bde1b441ab21a28c56cbf6064db35352d43a352dd652b4d0f'
             '780977d71e35bbe4c0dcda5272895267d68d635f311e224f7981858f7192a85e'
             '49f3951de5af196c7d5193a879db7f464bb326e0da1411fe01b977c2d8042520'
             '6554926f4366d8dbb0621aad27832931304183373655e0bdc2bc7c4a58419309'
@@ -158,9 +168,14 @@ prepare() {
     winsup/cygwin/include/cygwin/exit_process.h \
     winsup/cygwin/fhandler_dev_fd.cc
 
+  if [ "$_use_temp_dll_prefix" != "no" ]; then
+    apply_git_am_with_msg 0003-Rename-dll-from-cygwin-to-temp-msys.patch
+  else
+    apply_git_am_with_msg 0003-Rename-dll-from-cygwin-to-msys.patch
+  fi
+
  apply_git_am_with_msg 0001-Add-MSYS2-triplet.patch \
   0002-Fix-msys-library-name-in-import-libraries.patch \
-  0003-Rename-dll-from-cygwin-to-msys.patch \
   0004-Add-functionality-for-converting-UNIX-paths-in-argum.patch \
   0005-Add-functionality-for-changing-OS-name-via-MSYSTEM-e.patch \
   0006-Move-root-to-usr.-Change-sorting-mount-points.-By-de.patch \
@@ -246,15 +261,15 @@ build() {
 
   # split debug info from msys-2.0.dll
   cd "${srcdir}"/dest
-  objcopy --add-gnu-debuglink=/dev/null --only-keep-debug ${_install_prefix:1}/bin/msys-2.0.dll ${_install_prefix:1}/bin/msys-2.0.dbg
-  objcopy -g --add-gnu-debuglink=${_install_prefix:1}/bin/msys-2.0.dbg ${_install_prefix:1}/bin/msys-2.0.dll ${_install_prefix:1}/bin/msys-2.0.dll.new
-  mv -f ${_install_prefix:1}/bin/msys-2.0.dll.new ${_install_prefix:1}/bin/msys-2.0.dll
+  objcopy --add-gnu-debuglink=/dev/null --only-keep-debug ${_install_prefix:1}/bin/${_DLL_BASENAME}.dll ${_install_prefix:1}/bin/msys-2.0.dbg
+  objcopy -g --add-gnu-debuglink=${_install_prefix:1}/bin/msys-2.0.dbg ${_install_prefix:1}/bin/${_DLL_BASENAME}.dll ${_install_prefix:1}/bin/msys-2.0.dll.new
+  mv -f ${_install_prefix:1}/bin/msys-2.0.dll.new ${_install_prefix:1}/bin/${_DLL_BASENAME}.dll
 }
 
 package_opt-msys2-runtime() {
   pkgdesc="Posix emulation engine for Windows"
-  conflicts=('catgets' 'libcatgets' 'msys2-runtime-3.6')
-  replaces=('catgets' 'libcatgets' 'msys2-runtime-3.6')
+  #conflicts=('catgets' 'libcatgets' 'msys2-runtime-3.6')
+  #replaces=('catgets' 'libcatgets' 'msys2-runtime-3.6')
 
   mkdir -p "${pkgdir}"${_install_prefix}
   cp -rf "${srcdir}"/dest${_install_prefix}/bin "${pkgdir}"${_install_prefix}/
@@ -265,6 +280,10 @@ package_opt-msys2-runtime() {
   rm -f "${pkgdir}"${_install_prefix}/bin/cyglsa64.dll
   rm -f "${pkgdir}"${_install_prefix}/bin/cygserver-config
   cp -rf "${srcdir}"/dest${_install_prefix}/share "${pkgdir}"${_install_prefix}/
+
+  if [ "$_use_temp_dll_prefix" == "yes" ]; then
+    rm -f "${pkgdir}"${_install_prefix}/bin/msys-2.0.dll
+  fi
 }
 
 package_opt-msys2-runtime-devel() {
@@ -284,5 +303,9 @@ package_opt-msys2-runtime-devel() {
   cp -rLf "${srcdir}"/dest${_install_prefix}/${CHOST}/lib "${pkgdir}"${_install_prefix}/
 
   # compatibility with Cygwin toolchains
-  cp "${srcdir}"/dest${_install_prefix}/${CHOST}/lib/libmsys-2.0.a "${pkgdir}"${_install_prefix}/lib/libcygwin.a
+  cp "${srcdir}"/dest${_install_prefix}/${CHOST}/lib/lib${_DLL_BASENAME}.a "${pkgdir}"${_install_prefix}/lib/libcygwin.a
+
+  if [ "$_use_temp_dll_prefix" == "yes" ]; then
+    rm -f "${pkgdir}"${_install_prefix}/lib/libmsys-2.0.a
+  fi
 }
