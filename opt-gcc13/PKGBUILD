@@ -519,6 +519,8 @@ package_opt-gcc()
   rm -f ${pkgdir}${_install_prefix}/share/info/{libgomp,libquadmath}.info
   rm -f ${pkgdir}${_install_prefix}/share/locale/{de,fr}/LC_MESSAGES/libstdc++.mo
 
+  rm -f ${pkgdir}${_install_prefix}/share/info/dir
+
   # remove static libraries - note libstdc++.a is needed for the binutils and glibc testsuite
   #rm ${pkgdir}${_install_prefix}/lib/gcc/${CYGWIN_CHOST}/${pkgver}/lib{gomp,quadmath}{.dll,}.a
 
