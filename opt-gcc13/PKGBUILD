@@ -8,25 +8,43 @@
 # Contributor: Tim Stahlhut <stahta01@gmail.com>
 #
 ##
+# I.    Static build Mode
 # Set _enable_gcc_bootmode to yes in part 1A
 # Set _enable_static_libgcc/_use_static_libgcc to yes in part 1A
 # toolchain initial build order part 1A: opt-zlib opt-binutils opt-gcc
-# Set _use_static_libgcc to yes in part 2A
-# toolchain initial build order part 2A: opt-libiconv opt-gettext
+# Set _use_static_libgcc to yes in part 1B
+# toolchain initial build order part 1B: opt-libiconv opt-gettext
+# II.   Temp DLL name build Mode
 #   32 bits use opt-msys2-runtime-3.3-gcc13
-# toolchain initial build order part 2B: opt-msys2-runtime-gcc13
+# Set _use_temp_dll_prefix to yes in part 2A
+# toolchain initial build order part 2A: opt-msys2-runtime-gcc13
+# Set _use_temp_dll_prefix to yes in part 2B
+# Set _enable_gcc_bootmode to no in part 2B and later
+# Set _enable_static_libgcc to no in part 2B and later
+# toolchain initial build order part 2B: opt-gcc
+# Set _use_static_libgcc to no in part 2C and later
+# toolchain initial build order part 2C: opt-zlib opt-binutils
+# toolchain initial build order part 2D: opt-libiconv opt-gettext
+# III.  Both DLL name build Mode
+#   32 bits use opt-msys2-runtime-3.3-gcc13
+# Set _use_temp_dll_prefix=both in 3A
+# toolchain initial build order part 3A: opt-msys2-runtime-gcc13
+# Set _use_temp_dll_prefix=no in 3B and later
+# toolchain initial build order part 3B: opt-gcc
+# toolchain initial build order part 3C: opt-zlib opt-binutils
+# toolchain initial build order part 3D: opt-libiconv opt-gettext
+# IV.   Final build Mode
+#   32 bits use opt-msys2-runtime-3.3-gcc13
+# Set _use_temp_dll_prefix=no in 4A and later
+# toolchain initial build order part 4A: opt-msys2-runtime-gcc13 
+# toolchain initial build order part 4B: opt-gcc
+# toolchain initial build order part 4C: opt-zlib opt-binutils
+# toolchain initial build order part 4D: opt-libiconv opt-gettext
+# toolchain initial build order part 4E: opt-libtool to be written
+# toolchain initial build order part 4F: opt-gcc
 
-# Set _enable_gcc_bootmode to no in part 3 and later
-# Set _enable_static_libgcc/_use_static_libgcc to no in part 3 and later
-# toolchain initial build order part 3: opt-gcc opt-zlib opt-binutils
-# Set _use_opt_gettext_devel set to yes in opt-libiconv for part 4A and later
-# Set _use_static_libgcc to no in part 4A
-# toolchain initial build order part 4A: opt-libiconv opt-gettext
 #   32 bits use opt-msys2-runtime-3.3-gcc13
-# toolchain initial build order part 4B: opt-msys2-runtime-gcc13 opt-libtool
-
-#   32 bits use opt-msys2-runtime-3.3-gcc13
-# NOTE: updating opt-msys2-runtime-gcc13 requires starting at part 3
+# NOTE: updating opt-msys2-runtime-gcc13 requires starting at part 4A or 2A for major changes
 # NOTE: opt-gdb must be rebuilt with each new gcc version. To be written.
 # NOTE: opt-libtool must be rebuilt with each new gcc version.
 
