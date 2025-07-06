@@ -1,0 +1,57 @@
+# Contributor: Alexey Pavlov <alexpux@gmail.com>
+
+_install_prefix="/opt${MSYSTEM_PREFIX}"
+
+pkgname="opt-msys2-w32api-headers"
+pkgver=13.0.0.r0.gde62c283f
+pkgrel=1
+pkgdesc="Win32 API headers for MSYS2 32bit toolchain"
+arch=('i686' 'x86_64')
+url="https://mingw-w64.sourceforge.io/"
+license=('custom')
+depends=()
+makedepends=('git' 'autotools')
+if [[ "${CARCH}" == 'i686' ]]; then
+  makedepends+=('mingw-w64-cross-mingw32-gcc')
+else
+  makedepends+=('mingw-w64-cross-mingw64-gcc')
+fi
+options=('staticlibs' '!buildflags')
+_commit='de62c283f3383bd825c98518cb0a42ba071d4ac2'
+source=("mingw-w64"::"git+https://git.code.sf.net/p/mingw-w64/mingw-w64#commit=$_commit")
+sha256sums=('be06c383a44f9ccb0da7884e72b3ecffb503e2bddc10ce2b7eb1e0fa9fa08d6f')
+msys2_references=(
+  'cygwin: w32api-runtime'
+  'cpe: cpe:/a:mingw-w64:mingw-w64'
+)
+
+pkgver() {
+  cd "${srcdir}/mingw-w64"
+  git describe --long ${_commit} | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//g'
+}
+
+prepare() {
+  cd ${srcdir}/mingw-w64
+}
+
+build() {
+  cd ${srcdir}/mingw-w64/mingw-w64-headers
+
+  unset CC CXX
+
+  ./configure \
+     --build=${CHOST} \
+     --host=${CARCH}-w64-mingw32 \
+     --prefix=${_install_prefix} \
+     --enable-sdk=all \
+     --enable-w32api \
+     --with-default-win32-winnt=0x601
+
+  make
+}
+
+package() {
+  cd ${srcdir}/mingw-w64/mingw-w64-headers
+
+  make DESTDIR=${pkgdir} install
+}
