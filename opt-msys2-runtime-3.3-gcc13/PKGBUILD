@@ -10,7 +10,7 @@ else
   pkgname=('opt-msys2-runtime-3.3' 'opt-msys2-runtime-3.3-devel')
 fi
 pkgver=3.3.6
-pkgrel=15
+pkgrel=1
 pkgdesc="Cygwin POSIX emulation engine"
 arch=('i686' 'x86_64')
 url="https://www.cygwin.com/"
