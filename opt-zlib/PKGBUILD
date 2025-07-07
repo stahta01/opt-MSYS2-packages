@@ -2,14 +2,14 @@
 
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
-_enable_gcc_bootmode=yes
+_enable_gcc_bootmode=no
 _use_static_libgcc=yes
 
 _realname=zlib
 pkgbase=opt-${_realname}
 pkgname=('opt-zlib' 'opt-zlib-devel')
 pkgver=1.3.1
-pkgrel=1
+pkgrel=2
 pkgdesc='Compression library implementing the deflate compression method found in gzip and PKZIP'
 arch=('i686' 'x86_64')
 groups=('libraries')
@@ -24,7 +24,7 @@ makedepends=('make' 'autotools')
 if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
   makedepends+=('gcc')
 else
-  makedepends+=('opt-gcc' 'opt-binutils')
+  makedepends+=('opt-gcc')
 fi
 source=("https://github.com/madler/zlib/releases/download/v${pkgver}/zlib-${pkgver}.tar.xz"{,.asc}
         zlib-1.2.13-configure.patch
