@@ -52,7 +52,7 @@
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 ### Major build options
-_enable_gcc_bootmode=yes   # Use no for production; yes to use normal GCC to build
+_enable_gcc_bootmode=no     # Use no for production; yes to use normal GCC to build
 _enable_bootstrap=no       # Use yes for production
 _enable_static_libgcc=yes    # Use no for production
 _use_temp_dll_prefix=no     # Use no for production
@@ -102,7 +102,7 @@ if [[ "$_enable_static_libgcc" != "yes" ]]; then
   pkgname+=('opt-gcc-libs')
 fi
 pkgver=13.4.1+d20250702.r0.c0.g04a71a35c3d0
-pkgrel=1
+pkgrel=2
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('spdx:GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND GCC-exception-3.1 AND GFDL-1.3-or-later')
@@ -286,12 +286,18 @@ build() {
   local CYGWIN_CHOST="${CHOST/-msys/-cygwin}"
 
   if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
-    export PATH="/opt/usr/bin:$PATH"
+    #export PATH="/opt/usr/bin:$PATH"
     export CC=/opt/usr/bin/gcc.exe
     export CXX=/opt/usr/bin/g++.exe
+    export LD=/opt/usr/bin/ld.exe
+    LDFLAGS+=" -L/opt/usr/lib/gcc/${CYGWIN_CHOST}/${pkgver%%+*} -L/opt/usr/lib -L/opt/usr/bin"
+  #else
+    #LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/bin"
   fi
 
   echo ""
+  echo "PATH := $PATH"
+  echo "LDFLAGS := $LDFLAGS"
   echo "CC [gcc] := ${CC-gcc}"
   echo "CXX [g++] := ${CXX-g++}"
   ${CC-gcc} --version | head -1
@@ -348,6 +354,7 @@ build() {
   if [[ "$_enable_static_libgcc" == "yes" ]]; then
     extra_config+=('--disable-shared')
     extra_config+=('--disable-shared-libgcc')
+    extra_config+=('--disable-host-shared')
   else
     extra_config+=('--enable-shared')
     extra_config+=('--enable-shared-libgcc')
@@ -391,8 +398,13 @@ build() {
   echo "CC [gcc] := ${CC-gcc}"
   ${CC-gcc} --version | head -1
   ${CC-gcc} --help | tail -1
-  pacman -Q msys2-w32api-headers
-  pacman -Q msys2-w32api-runtime
+  if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+    pacman -Q msys2-w32api-headers
+    pacman -Q msys2-w32api-runtime
+  else
+    pacman -Q opt-msys2-w32api-headers
+    pacman -Q opt-msys2-w32api-runtime
+  fi
   echo ""
 
   ${srcdir}/${_sourcedir}/configure \
