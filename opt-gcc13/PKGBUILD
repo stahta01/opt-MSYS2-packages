@@ -111,12 +111,12 @@ msys2_references=(
   "cpe: cpe:/a:gnu:gcc"
 )
 makedepends=('autotools' 'git'
-             'opt-zlib-devel'
              'windows-default-manifest' 'gperf')
 if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
   makedepends+=('gcc' 'zlib-devel')
 else
   makedepends+=('opt-gcc')
+  makedepends+=('opt-zlib-devel')
   makedepends+=('opt-binutils')
 fi
 MPFR_VERSION=4.1.0
@@ -485,17 +485,21 @@ package_opt-gcc-libs()
 package_opt-gcc()
 {
   pkgdesc="The GNU Compiler Collection - C and C++ frontends"
-  depends=('binutils' 'msys2-w32api-headers' 'msys2-w32api-runtime' 'windows-default-manifest')
+  depends=('windows-default-manifest')
   if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
-    depends+=('msys2-runtime-devel')
+    depends+=('binutils' 'msys2-runtime-devel' 'msys2-w32api-headers' 'msys2-w32api-runtime')
   else
-    depends+=('opt-msys2-runtime-devel')
+    depends+=('opt-binutils' 'opt-msys2-runtime-devel' 'opt-msys2-w32api-headers' 'opt-msys2-w32api-runtime')
   fi
   if [[ "$_enable_static_libgcc" != "yes" ]]; then
     depends+=("opt-gcc-libs=${pkgver}-${pkgrel}")
   fi
   if [[ "$_enable_system_zlib" == "yes" ]]; then
-    depends+=('opt-zlib')
+    if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+      depends+=('zlib')
+    else
+      depends+=('opt-zlib')
+    fi
   fi
   #options=("!strip")
   provides=('msys2-devel')
