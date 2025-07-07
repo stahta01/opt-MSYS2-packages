@@ -502,8 +502,6 @@ package_opt-gcc()
     fi
   fi
   #options=("!strip")
-  provides=('msys2-devel')
-  conflicts=('gcc-fortran<=11.3.0-4')
 
   cd ${srcdir}/build-${MSYSTEM_CARCH}
 
