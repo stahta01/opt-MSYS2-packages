@@ -56,6 +56,7 @@ _enable_gcc_bootmode=no     # Use no for production; yes to use normal GCC to bu
 _enable_bootstrap=no       # Use yes for production
 _enable_static_libgcc=yes    # Use no for production
 _use_temp_dll_prefix=no     # Use no for production
+_use_GMP_MPFR_intree=no      # Use yes for production
 options=('staticlibs' '!emptydirs' '!strip' '!debug')
 #options=('!emptydirs') # '!strip' 'debug')
 ### Language build options
@@ -118,6 +119,10 @@ else
   makedepends+=('opt-gcc')
   makedepends+=('opt-zlib-devel')
   makedepends+=('opt-binutils')
+  if [[ "$_use_GMP_MPFR_intree" == "no" ]]; then
+    makedepends+=('opt-gmp-static')
+    makedepends+=('opt-mpfr-static')
+  fi
 fi
 MPFR_VERSION=4.1.0
 GMP_VERSION=6.2.1
@@ -230,8 +235,13 @@ prepare() {
   time git clean -fdx
 
   cd ${srcdir}
-  _extract_to_gcc_folder            gmp-${GMP_VERSION}.tar.bz2
-  _extract_to_gcc_folder            mpfr-${MPFR_VERSION}.tar.bz2
+  if [[ "$_use_GMP_MPFR_intree" == "yes" ]]; then
+    _extract_to_gcc_folder          gmp-${GMP_VERSION}.tar.bz2
+    _extract_to_gcc_folder          mpfr-${MPFR_VERSION}.tar.bz2
+  else
+    rm -fr ${srcdir}/${_sourcedir}/gmp
+    rm -fr ${srcdir}/${_sourcedir}/mpfr
+  fi
   _extract_to_gcc_folder            mpc-${MPC_VERSION}.tar.gz
   if [[ "$_enable_graphite" == "yes" ]]; then
     _extract_to_gcc_folder          isl-${ISL_VERSION}.tar.bz2
@@ -289,6 +299,7 @@ build() {
     export PATH="/opt/usr/bin:$PATH"
     export CC=/opt/usr/bin/gcc.exe
     export CXX=/opt/usr/bin/g++.exe
+    export LD=/opt/usr/bin/ld.exe
   fi
 
   echo ""
@@ -345,6 +356,10 @@ build() {
     _languages+=",jit"
   fi
 
+  if [[ "$_use_GMP_MPFR_intree" == "no" ]]; then
+    extra_config+=('--with-gmp=${_install_prefix}')
+    extra_config+=('--with-mpfr=${_install_prefix}')
+  fi
   if [[ "$_enable_static_libgcc" == "yes" ]]; then
     extra_config+=('--disable-shared')
     extra_config+=('--disable-shared-libgcc')
