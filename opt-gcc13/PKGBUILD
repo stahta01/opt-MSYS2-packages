@@ -54,7 +54,7 @@ _install_prefix="/opt${MSYSTEM_PREFIX}"
 ### Major build options
 _enable_gcc_bootmode=no     # Use no for production; yes to use normal GCC to build
 _enable_bootstrap=no       # Use yes for production
-_enable_static_libgcc=yes    # Use no for production
+_enable_static_libgcc=no    # Use no for production
 _use_temp_dll_prefix=no     # Use no for production
 options=('staticlibs' '!emptydirs' '!strip' '!debug')
 #options=('!emptydirs') # '!strip' 'debug')
@@ -68,7 +68,7 @@ _enable_jit=no
 _enable_libquadmath=no      # Use no for production
 _enable_libgomp=yes         # Use yes for production
 _enable_graphite=yes        # Use yes for production
-_enable_lto=yes             # Use yes for production
+_enable_lto=no             # Use yes for production
 _enable_system_zlib=yes     # Use yes for production
 # =========================================== #
 if [[ "$_enable_fortran" == "yes" && "$_enable_libquadmath" != "yes" ]]; then
@@ -102,7 +102,7 @@ if [[ "$_enable_static_libgcc" != "yes" ]]; then
   pkgname+=('opt-gcc-libs')
 fi
 pkgver=13.4.1+d20250702.r0.c0.g04a71a35c3d0
-pkgrel=2
+pkgrel=3
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('spdx:GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND GCC-exception-3.1 AND GFDL-1.3-or-later')
@@ -286,12 +286,17 @@ build() {
   local CYGWIN_CHOST="${CHOST/-msys/-cygwin}"
 
   if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
+    # export PATH="/opt/usr/bin:/opt/usr/lib/gcc/${CYGWIN_CHOST}/${pkgver%%+*}:$PATH"
     export PATH="/opt/usr/bin:$PATH"
     export CC=/opt/usr/bin/gcc.exe
     export CXX=/opt/usr/bin/g++.exe
+    export COLLECT_GCC=/opt/usr/bin/gcc
+    #COLLECT_LTO_WRAPPER=/usr/bin/../lib/gcc/x86_64-pc-cygwin/13.4.1/lto-wrapper.exe
+    export LDFLAGS+=" -L/opt/usr/lib/w32api"
   fi
 
   echo ""
+  echo "PATH := $PATH"
   echo "CC [gcc] := ${CC-gcc}"
   echo "CXX [g++] := ${CXX-g++}"
   ${CC-gcc} --version | head -1
@@ -432,7 +437,8 @@ build() {
     --with-bugurl="https://github.com/stahta01/opt-MSYS2-packages/issues" \
     "${extra_config[@]}"
 
-  make
+  # all-build-libiberty
+  make --jobs=1
 
   # make documentation
   #cd ${CYGWIN_CHOST}/libstdc++-v3
@@ -479,6 +485,7 @@ package_opt-gcc-libs()
   rm -f ${pkgdir}/*.dll
   rm -rf ${pkgdir}${_install_prefix}/lib/
   rm -rf ${pkgdir}${_install_prefix}/share/gcc-${pkgver%%+*}
+  rm -f  ${pkgdir}${_install_prefix}/share/info/dir
 
   # remove static libraries
   #find ${pkgdir} -name *.a -delete
