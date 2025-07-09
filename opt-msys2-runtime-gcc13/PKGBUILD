@@ -253,8 +253,6 @@ build() {
 
 package_opt-msys2-runtime() {
   pkgdesc="Posix emulation engine for Windows"
-  conflicts=('catgets' 'libcatgets' 'msys2-runtime-3.6')
-  replaces=('catgets' 'libcatgets' 'msys2-runtime-3.6')
 
   mkdir -p "${pkgdir}"${_install_prefix}
   cp -rf "${srcdir}"/dest${_install_prefix}/bin "${pkgdir}"${_install_prefix}/
