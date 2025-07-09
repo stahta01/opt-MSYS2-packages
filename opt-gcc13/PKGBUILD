@@ -56,7 +56,7 @@ _enable_gcc_bootmode=no     # Use no for production; yes to use normal GCC to bu
 _enable_bootstrap=no       # Use yes for production
 _enable_static_libgcc=yes    # Use no for production
 _use_temp_dll_prefix=no     # Use no for production
-_use_GMP_MPFR_intree=no      # Use yes for production
+_use_GMP_MPFR_intree=yes    # Use yes for production
 options=('staticlibs' '!emptydirs' '!strip' '!debug')
 #options=('!emptydirs') # '!strip' 'debug')
 ### Language build options
