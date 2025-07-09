@@ -348,6 +348,7 @@ build() {
   if [[ "$_enable_static_libgcc" == "yes" ]]; then
     extra_config+=('--disable-shared')
     extra_config+=('--disable-shared-libgcc')
+    extra_config+=('--disable-host-shared')
   else
     extra_config+=('--enable-shared')
     extra_config+=('--enable-shared-libgcc')
