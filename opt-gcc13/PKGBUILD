@@ -464,7 +464,10 @@ build() {
   fi
   make --jobs=1 all-fixincludes
   make --jobs=1 all-libiberty
-  make --jobs=1 all-gcc
+  make --jobs=1 all-intl
+  make --jobs=1 all-build-libiberty
+  make --jobs=1 all-build-fixincludes
+  make --jobs=1 all-build-libcpp
   if [[ "$_do_dll_rename" == "yes" ]]; then
     mv /opt/usr/bin/msys-2.0.dll.save /opt/usr/bin/msys-2.0.dll
   fi
