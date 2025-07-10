@@ -1,0 +1,65 @@
+# Contributor: Alexey Pavlov <alexpux@gmail.com>
+
+_install_prefix="/opt${MSYSTEM_PREFIX}"
+
+_enable_gcc_bootmode=yes # no
+
+_realname='isl'
+pkgbase=opt-${_realname}-static
+pkgname=('opt-isl-static')
+pkgver=0.27
+pkgrel=1
+pkgdesc="Library for manipulating sets and relations of integer points bounded by linear constraints"
+arch=('i686' 'x86_64')
+url="https://libisl.sourceforge.io/"
+groups=('libraries' 'development')
+makedepends=('opt-gmp-static' 'autotools' 'gcc')
+license=('spdx:MIT')
+source=(https://libisl.sourceforge.io/${_realname}-${pkgver}.tar.xz
+        isl-0.14.1-no-undefined.patch)
+sha256sums=('6d8babb59e7b672e8cb7870e874f3f7b813b6e00e6af3f8b04f7579965643d5c'
+            '83655a7202f0a0dcce1782d4b365252bf1ad12a522b7ad82ab578ee5ec46433b')
+
+prepare() {
+  cd "${srcdir}/${_realname}-${pkgver}"
+  patch -p1 -i ${srcdir}/isl-0.14.1-no-undefined.patch
+
+  autoreconf -fi
+}
+
+build() {
+  cd "$srcdir/${_realname}-${pkgver}"
+
+  if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
+    export PATH="/opt/usr/bin:$PATH"
+    export CC=/opt/usr/bin/gcc.exe
+    export CXX=/opt/usr/bin/g++.exe
+    export RANLIB=/opt/usr/bin/ranlib.exe
+    export LD=/opt/usr/bin/ld.exe
+  fi
+
+  ./configure \
+    --build="${CHOST}" \
+    --prefix=${_install_prefix} \
+    --with-gmp-prefix=${_install_prefix} \
+    --disable-shared \
+    --enable-static
+  make
+  make -j1 DESTDIR="${srcdir}/dest" install
+}
+
+check() {
+  cd "${srcdir}/${_realname}-${pkgver}"
+  make check
+}
+
+package_opt-isl-static() {
+  mkdir -p ${pkgdir}${_install_prefix}
+
+  cp -rf ${srcdir}/dest${_install_prefix}/include ${pkgdir}${_install_prefix}/
+  cp -rf ${srcdir}/dest${_install_prefix}/lib ${pkgdir}${_install_prefix}/
+
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/LICENSE ${pkgdir}${_install_prefix}/share/licenses/isl/LICENSE
+  #install -dm755 "${pkgdir}"${_install_prefix}/share/gdb/auto-load/usr/lib/
+  #mv "$pkgdir"${_install_prefix}/lib/libisl.dll.*-gdb.py "${pkgdir}"${_install_prefix}/share/gdb/auto-load/usr/lib/
+}
