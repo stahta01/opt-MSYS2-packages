@@ -58,9 +58,11 @@ build() {
   export MSYSTEM=CYGWIN
 
   if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
-    export PATH="/opt/usr/bin:$PATH"
+    #export PATH="/opt/usr/bin:$PATH"
     export CC=/opt/usr/bin/gcc.exe
     export CXX=/opt/usr/bin/g++.exe
+    export LD=/opt/usr/bin/ld.exe
+    LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/bin"
   fi
 
   if [[ "$_use_static_libgcc" == "yes" ]]; then
@@ -68,6 +70,9 @@ build() {
   fi
 
   echo ""
+  echo "PATH := $PATH"
+  echo "LDFLAGS := $LDFLAGS"
+  echo "LD [ld] := ${LD-ld}"
   echo "CC [gcc] := ${CC-gcc}"
   echo "CXX [g++] := ${CXX-g++}"
   ${CC-gcc} --version | head -1
