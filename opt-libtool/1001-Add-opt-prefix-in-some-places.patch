@@ -1,0 +1,41 @@
+From 17e6b93a3f9b27b55a5f51ff619023cdb67be1f1 Mon Sep 17 00:00:00 2001
+From: Tim Stahlhut <stahta01@gmail.com>
+Date: Sat, 12 Jul 2025 00:28:18 -0400
+Subject: Add /opt prefix in some places
+
+---
+ m4/libtool.m4 | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/m4/libtool.m4 b/m4/libtool.m4
+index 99b53ad0..a9d0722c 100644
+--- a/m4/libtool.m4
++++ b/m4/libtool.m4
+@@ -2446,7 +2446,7 @@ BEGIN {RS = " "; FS = "/|\n";} {
+   esac
+   sys_lib_search_path_spec=`$ECHO "$lt_search_path_spec" | $lt_NL2SP`
+ else
+-  sys_lib_search_path_spec="/lib /usr/lib /usr/local/lib"
++  sys_lib_search_path_spec="/lib /opt/usr/lib /usr/lib /usr/local/lib"
+ fi])
+ library_names_spec=
+ libname_spec='lib$name'
+@@ -2460,7 +2460,7 @@ shlibpath_var=
+ shlibpath_overrides_runpath=unknown
+ version_type=none
+ dynamic_linker="$host_os ld.so"
+-sys_lib_dlsearch_path_spec="/lib /usr/lib"
++sys_lib_dlsearch_path_spec="/lib /opt/usr/lib /usr/lib"
+ need_lib_prefix=unknown
+ hardcode_into_libs=no
+ 
+@@ -2654,7 +2654,7 @@ cygwin* | mingw* | windows* | pw32* | cegcc*)
+       # Cygwin DLLs use 'cyg' prefix rather than 'lib'
+       soname_spec='`echo $libname | $SED -e 's/^lib/cyg/'``echo $release | $SED -e 's/[[.]]/-/g'`$versuffix$shared_ext'
+ m4_if([$1], [],[
+-      sys_lib_search_path_spec="$sys_lib_search_path_spec /usr/lib/w32api"])
++      sys_lib_search_path_spec="$sys_lib_search_path_spec /opt/usr/lib/w32api"])
+       ;;
+     mingw* | windows* | cegcc*)
+       # MinGW DLLs use traditional 'lib' prefix
+-- 
