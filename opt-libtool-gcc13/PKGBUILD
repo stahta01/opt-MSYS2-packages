@@ -2,13 +2,13 @@
 
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
-_enable_gcc_bootmode=yes # not yet coded for no
+_enable_gcc_bootmode=yes
 
 _realname='libtool'
-pkgbase=opt-${_realname}
+pkgbase=opt-${_realname}-gcc13
 pkgname=('opt-libtool' 'opt-libltdl')
 pkgver=2.5.4
-pkgrel=1
+pkgrel=2
 pkgdesc="A generic library support script"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/libtool"
@@ -19,10 +19,14 @@ license=('spdx:LGPL-2.0-or-later WITH Libtool-exception')
 makedepends=(
   "autoconf-wrapper"
   "automake-wrapper"
-  "gcc"
   "help2man"
   "m4"
 )
+if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
+  makedepends=('opt-gcc')
+else
+  makedepends=('gcc13')
+fi
 source=(https://ftp.gnu.org/gnu/libtool/${_realname}-${pkgver}.tar.xz{,.sig}
         0001-cygwin-mingw-Create-UAC-manifest-files.patch
         0002-Fix-seems-to-be-moved.patch
@@ -33,7 +37,8 @@ source=(https://ftp.gnu.org/gnu/libtool/${_realname}-${pkgver}.tar.xz{,.sig}
         0007-msysize.patch
         0011-Pick-up-clang_rt-static-archives-compiler-internal-l.patch
         0013-Allow-statically-linking-compiler-support-libraries-.patch
-        0014-Support-llvm-objdump-f-output.patch)
+        0014-Support-llvm-objdump-f-output.patch
+        1001-Add-opt-prefix-in-some-places.patch)
 sha256sums=('f81f5860666b0bc7d84baddefa60d1cb9fa6fceb2398cc3baca6afaa60266675'
             'SKIP'
             '67e4f2429dfe67499b1829d0a8312d9a043057db354307f8db41d9f967944346'
@@ -45,7 +50,8 @@ sha256sums=('f81f5860666b0bc7d84baddefa60d1cb9fa6fceb2398cc3baca6afaa60266675'
             'fca5986c0010b202ee65c69939815269bd46b3ce948d9222916985652da7e2af'
             'de68dc9387f47ee129f55b2f525a7d222374ddd8915f4f42af05f185b779b826'
             '8069e887aeeab7491f15e00547fa66d9b9e86407f5a23f37a6d8c7d165de752e'
-            'e62e836f018339974f5ef7cf81bc0a4252901158eb0824eb62d0270206093ad7')
+            'e62e836f018339974f5ef7cf81bc0a4252901158eb0824eb62d0270206093ad7'
+            'fb6e61afb1074ffb11351ac13829e41807ddd5b9e809ae67d2de9758a0dda4f2')
 validpgpkeys=('7C5FBB96BE82B954AC20DF5F6EAC957F8EEB55C0'  # Alex Ameen <alex.ameen.tx@gmail.com>
               'FA26CA784BE188927F22B99F6570EA01146F7354') # Ileana Dumitrescu <ileanadumi95@protonmail.com>
 
@@ -72,7 +78,8 @@ prepare() {
     0007-msysize.patch \
     0011-Pick-up-clang_rt-static-archives-compiler-internal-l.patch \
     0013-Allow-statically-linking-compiler-support-libraries-.patch \
-    0014-Support-llvm-objdump-f-output.patch
+    0014-Support-llvm-objdump-f-output.patch \
+    1001-Add-opt-prefix-in-some-places.patch
 
   autoconf -f
 }
@@ -80,12 +87,33 @@ prepare() {
 build() {
   cd "${_realname}-${pkgver}"
 
-  ./configure \
-    --build=${CHOST} \
-    --prefix=${_install_prefix} \
-    lt_cv_sys_lib_dlsearch_path_spec="${_install_prefix}/lib /usr/lib /lib"
+  if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
+    export PATH="/opt/usr/bin:$PATH"
+    export CC=/opt/usr/bin/gcc.exe
+    export CXX=/opt/usr/bin/g++.exe
+    export LD=/opt/usr/bin/ld.exe
+    export LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/lib/w32api -L/opt/usr/bin"
+    export AR=/opt/usr/bin/ar.exe
+    export RANLIB=/opt/usr/bin/ranlib.exe
+  fi
 
-  make
+  echo ""
+  echo "PATH := $PATH"
+  echo "LDFLAGS := $LDFLAGS"
+  echo "LD [ld] := ${LD-ld}"
+  echo "CC [gcc] := ${CC-gcc}"
+  echo "CXX [g++] := ${CXX-g++}"
+  ${CC-gcc} --version | head -1
+  echo ""
+
+  LDFLAGS+=" -L/usr/lib -L/usr/lib/w32api" \
+  ./configure \
+    --build=${CHOST/-msys/-cygwin} \
+    --prefix=${_install_prefix} \
+    lt_cv_sys_lib_dlsearch_path_spec="${_install_prefix}/lib /usr/lib /lib" \
+    lt_cv_sys_lib_search_path_spec="${_install_prefix}/lib/gcc/x86_64-pc-cygwin/13.4.1 ${_install_prefix}/x86_64-pc-cygwin/lib ${_install_prefix}/lib /usr/lib ${_install_prefix}/lib/w32api"
+
+  make --jobs=1 V=1
 }
 
 check() {
@@ -105,6 +133,10 @@ package_opt-libtool() {
   rm -f ${pkgdir}${_install_prefix}/share/info/dir
 
   install -Dm644 "${srcdir}/${_realname}-${pkgver}/COPYING" -t "${pkgdir}${_install_prefix}/share/licenses/${_realname}"
+
+  sed -i 's|LD="/usr/|LD="/opt/usr/|' ${pkgdir}${_install_prefix}/bin/libtool
+  sed -i 's|predep_objects="/usr/|predep_objects="/opt/usr/|' ${pkgdir}${_install_prefix}/bin/libtool
+  sed -i 's|postdep_objects="/usr/|postdep_objects="/opt/usr/|' ${pkgdir}${_install_prefix}/bin/libtool
 }
 
 package_opt-libltdl() {
