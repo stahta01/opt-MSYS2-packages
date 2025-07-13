@@ -2,7 +2,7 @@
 
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
-_enable_gcc_bootmode=yes
+_enable_gcc_bootmode=no
 
 _realname='libtool'
 pkgbase=opt-${_realname}-gcc13
