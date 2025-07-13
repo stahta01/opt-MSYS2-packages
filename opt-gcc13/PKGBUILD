@@ -53,7 +53,7 @@ _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 ### Major build options
 _enable_gcc_bootmode=no     # Use no for production; yes to use normal GCC to build
-_enable_bootstrap=no       # Use yes for production
+_enable_bootstrap=yes       # Use yes for production
 _enable_static_libgcc=yes    # Use no for production
 _use_temp_dll_prefix=no     # Use no for production
 options=('staticlibs' '!emptydirs' '!strip' '!debug')
@@ -102,7 +102,7 @@ if [[ "$_enable_static_libgcc" != "yes" ]]; then
   pkgname+=('opt-gcc-libs')
 fi
 pkgver=13.4.1+d20250702.r0.c0.g04a71a35c3d0
-pkgrel=2
+pkgrel=3
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('spdx:GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND GCC-exception-3.1 AND GFDL-1.3-or-later')
@@ -287,9 +287,9 @@ build() {
 
   if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
     #export PATH="/opt/usr/bin:$PATH"
-    export CC=/opt/usr/bin/gcc.exe
-    export CXX=/opt/usr/bin/g++.exe
-    export LD=/opt/usr/bin/ld.exe
+    export CC=/opt/usr/bin/gcc
+    export CXX=/opt/usr/bin/g++
+    export LD=/opt/usr/bin/ld
     LDFLAGS+=" -L/opt/usr/lib/gcc/${CYGWIN_CHOST}/${pkgver%%+*} -L/opt/usr/lib -L/opt/usr/bin"
   #else
     #LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/bin"
@@ -398,6 +398,8 @@ build() {
   echo "CC [gcc] := ${CC-gcc}"
   ${CC-gcc} --version | head -1
   ${CC-gcc} --help | tail -1
+  pacman -Q gcc || true
+  pacman -Q opt-gcc
   if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
     pacman -Q msys2-w32api-headers
     pacman -Q msys2-w32api-runtime
@@ -410,6 +412,8 @@ build() {
   ${srcdir}/${_sourcedir}/configure \
     --build=${CYGWIN_CHOST} \
     --prefix=${_install_prefix} \
+    --with-sysroot=${_install_prefix} \
+    --with-native-system-header-dir=/include \
     --libexecdir=${_install_prefix}/lib \
     --enable-static \
     --enable-version-specific-runtime-libs \
