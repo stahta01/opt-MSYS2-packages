@@ -431,6 +431,7 @@ build() {
   ${srcdir}/${_sourcedir}/configure \
     --build=${CYGWIN_CHOST} \
     --prefix=${_install_prefix} \
+    --with-build-time-tools=${_install_prefix}/bin \
     --with-sysroot=${_install_prefix} \
     --with-native-system-header-dir=/include \
     --libexecdir=${_install_prefix}/lib \
