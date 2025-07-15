@@ -1,6 +1,3 @@
-git clone --no-tags --single-branch \
+git clone --no-tags --mirror \
   --branch releases/gcc-13 --progress --no-checkout \
-  -- https://github.com/gcc-mirror/gcc.git gcc-git && \
-cd gcc-git && \
-git remote remove origin && \
-git remote add origin https://github.com/gcc-mirror/gcc.git
+  -- https://github.com/gcc-mirror/gcc.git gcc-git
