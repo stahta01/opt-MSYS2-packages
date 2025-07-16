@@ -1,6 +1,6 @@
 # Contributor: Alexey Pavlov <alexpux@gmail.com>
 
-_test_build_mode=yes        # Yes builds in /usr; no in /opt/usr
+_test_build_mode=no         # Yes builds in /usr; no in /opt/usr
 _enable_gcc_bootmode=no
 _use_static_libgcc=yes
 _enable_system_zlib=no     # Use yes for production
@@ -15,7 +15,7 @@ _realname=binutils
 pkgbase=opt-${_realname}
 pkgname=opt-${_realname}
 pkgver=2.44
-pkgrel=2
+pkgrel=3
 pkgdesc="A set of programs to assemble and manipulate binary and object files"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/binutils/"
