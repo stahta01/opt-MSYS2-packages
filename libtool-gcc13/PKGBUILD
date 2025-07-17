@@ -4,7 +4,7 @@ _realname=libtool
 pkgbase=${_realname}-gcc13
 pkgname=('libtool-gcc13' 'libltdl-gcc13')
 pkgver=2.5.4
-pkgrel=1
+pkgrel=2
 pkgdesc="A generic library support script"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/libtool"
@@ -76,6 +76,7 @@ prepare() {
 build() {
   cd "${_realname}-${pkgver}"
 
+  LDFLAGS+=" -L/usr/lib -L/usr/lib/w32api" \
   ./configure \
     --build=${CHOST/-msys/-cygwin} \
     --prefix=/usr \
