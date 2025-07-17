@@ -4,7 +4,7 @@ _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 _enable_gcc_bootmode=yes
 _use_static_libgcc=yes
-_enable_system_zlib=yes     # Use yes for production
+_enable_system_zlib=no     # Use yes for production
 
 _realname=binutils
 pkgbase=opt-${_realname}
