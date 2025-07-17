@@ -271,9 +271,9 @@ build() {
 
   local CYGWIN_CHOST="${CHOST/-msys/-cygwin}"
 
-  export PATH="/opt/usr/bin:$PATH"
-  export CC=/opt/usr/bin/gcc.exe
-  export CXX=/opt/usr/bin/g++.exe
+  #export PATH="/opt/usr/bin:$PATH"
+  #export CC=/opt/usr/bin/gcc.exe
+  #export CXX=/opt/usr/bin/g++.exe
 
   echo ""
   echo "CC [gcc] := ${CC-gcc}"
