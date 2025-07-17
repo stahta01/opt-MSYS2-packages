@@ -9,7 +9,7 @@ _realname=binutils
 pkgbase=opt-${_realname}
 pkgname=opt-${_realname}
 pkgver=2.44
-pkgrel=1
+pkgrel=2
 pkgdesc="A set of programs to assemble and manipulate binary and object files"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/binutils/"
@@ -63,16 +63,19 @@ build() {
     export CXX=/opt/usr/bin/g++.exe
   fi
 
-  if [[ "$_use_static_libgcc" == "yes" ]]; then
-    export LDFLAGS+=" -static-libgcc -static-libstdc++"
-  fi
-
   echo ""
   echo "CC [gcc] := ${CC-gcc}"
   echo "CXX [g++] := ${CXX-g++}"
   ${CC-gcc} --version | head -1
   echo ""
 
+  if [[ "$_use_static_libgcc" == "yes" ]]; then
+    export LDFLAGS="-static-libgcc -static-libstdc++"
+  fi
+
+  # -nodefaultlibs 
+  CFLAGS="-I/opt/usr/include -I/opt/usr/include/w32api" \
+  LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/lib/w32api" \
   cd "${srcdir}"/binutils-${CARCH}
   ../binutils-${pkgver}/configure \
     --prefix=${_install_prefix} \
