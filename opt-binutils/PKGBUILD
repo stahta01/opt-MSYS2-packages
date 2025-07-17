@@ -4,12 +4,13 @@ _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 _enable_gcc_bootmode=yes
 _use_static_libgcc=yes
+_enable_system_zlib=no     # Use yes for production
 
 _realname=binutils
 pkgbase=opt-${_realname}
 pkgname=opt-${_realname}
 pkgver=2.44
-pkgrel=1
+pkgrel=2
 pkgdesc="A set of programs to assemble and manipulate binary and object files"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/binutils/"
@@ -17,13 +18,27 @@ msys2_references=(
   "cpe: cpe:/a:gnu:binutils"
 )
 license=('GPL')
-depends=('libiconv' 'libintl' 'opt-zlib')
+depends=('libiconv' 'libintl')
+if [[ "$_enable_system_zlib" == "yes" ]]; then
+  if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+    depends+=('zlib')
+  else
+    depends+=('opt-zlib')
+  fi
+fi
 checkdepends=('dejagnu' 'bc')
-makedepends=('opt-zlib-devel' 'autotools')
+makedepends=('autotools')
 if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
-  makedepends+=('gcc' 'zlib-devel' 'gettext-devel' 'libiconv-devel')
+  makedepends+=('gcc')
 else
-  makedepends+=('opt-gcc' 'opt-binutils' 'opt-gettext-devel' 'opt-libiconv-devel')
+  makedepends+=('opt-gcc' 'opt-binutils')
+fi
+if [[ "$_enable_system_zlib" == "yes" ]]; then
+  if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+    makedepends+=('zlib-devel')
+  else
+    makedepends+=('opt-zlib-devel')
+  fi
 fi
 options=('staticlibs' '!distcc' '!ccache')
 source=(https://ftp.gnu.org/gnu/binutils/binutils-${pkgver}.tar.xz{,.sig}
@@ -63,19 +78,30 @@ build() {
     export CXX=/opt/usr/bin/g++.exe
   fi
 
-  if [[ "$_use_static_libgcc" == "yes" ]]; then
-    export LDFLAGS+=" -static-libgcc -static-libstdc++"
-  fi
-
   echo ""
   echo "CC [gcc] := ${CC-gcc}"
   echo "CXX [g++] := ${CXX-g++}"
   ${CC-gcc} --version | head -1
   echo ""
 
+  declare -a extra_config
+  extra_config+=('--disable-nls')
+  if [ "$_enable_system_zlib" == "yes" ]; then
+    extra_config+=('--with-system-zlib')
+  else
+    extra_config+=('--without-system-zlib')
+  fi
+
+  if [[ "$_use_static_libgcc" == "yes" ]]; then
+    export LDFLAGS="-static-libgcc -static-libstdc++"
+  fi
+
+  CFLAGS="-I/opt/usr/include -I/opt/usr/include/w32api" \
+  LDFLAGS+=" -nodefaultlibs -L/opt/usr/lib -L/opt/usr/lib/w32api -lcygwin" \
   cd "${srcdir}"/binutils-${CARCH}
   ../binutils-${pkgver}/configure \
     --prefix=${_install_prefix} \
+    --with-sysroot=${_install_prefix} \
     --{build,host,target}=${CYGWIN_CHOST} \
     --disable-werror \
     --disable-sim \
@@ -83,7 +109,7 @@ build() {
     --enable-install-libiberty \
     --without-libiconv-prefix \
     --without-libintl-prefix \
-    --with-system-zlib
+    "${extra_config[@]}"
 
   make
 }
