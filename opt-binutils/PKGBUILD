@@ -85,6 +85,7 @@ build() {
   echo ""
 
   declare -a extra_config
+  extra_config+=('--disable-nls')
   if [ "$_enable_system_zlib" == "yes" ]; then
     extra_config+=('--with-system-zlib')
   else
@@ -100,6 +101,7 @@ build() {
   cd "${srcdir}"/binutils-${CARCH}
   ../binutils-${pkgver}/configure \
     --prefix=${_install_prefix} \
+    --with-sysroot=${_install_prefix} \
     --{build,host,target}=${CYGWIN_CHOST} \
     --disable-werror \
     --disable-sim \
