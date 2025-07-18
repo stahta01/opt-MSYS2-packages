@@ -54,7 +54,7 @@ if [[ "$_enable_static_libgcc" != "yes" ]]; then
   pkgname+=('gcc-libs')
 fi
 pkgver=13.4.1+d20250712.r0.c0.gd3acb727b8f4
-pkgrel=1
+pkgrel=2
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('spdx:GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND GCC-exception-3.1 AND GFDL-1.3-or-later')
@@ -333,6 +333,7 @@ build() {
     --build=${CYGWIN_CHOST} \
     --prefix=${_install_prefix} \
     --libexecdir=${_install_prefix}/lib \
+    --disable-nls \
     --enable-static \
     --enable-version-specific-runtime-libs \
     --with-arch=${_arch} \
