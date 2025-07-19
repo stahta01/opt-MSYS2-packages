@@ -3,11 +3,13 @@
 
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
+_enable_gcc_bootmode=yes
+
 _realname=msys2-runtime
 pkgbase=opt-${_realname}
 pkgname=('opt-msys2-runtime' 'opt-msys2-runtime-devel')
 pkgver=3.6.3
-pkgrel=1
+pkgrel=2
 pkgdesc="Cygwin POSIX emulation engine"
 arch=('x86_64')
 url="https://www.cygwin.com/"
@@ -24,11 +26,12 @@ makedepends=('cocom'
              'mingw-w64-cross-zlib'
              'autotools'
              'xmlto'
-             'docbook-xsl'
-             'opt-gcc'
-             'opt-zlib-devel'
-             'opt-gettext-devel'
-             'opt-libiconv-devel')
+             'docbook-xsl')
+if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+  makedepends+=('gcc' 'zlib-devel' 'gettext-devel' 'libiconv-devel')
+else
+  makedepends+=('opt-gcc' 'opt-zlib-devel' 'opt-gettext-devel' 'opt-libiconv-devel')
+fi
 # re zipman: https://github.com/msys2/MSYS2-packages/pull/2687#issuecomment-965714874
 options=('!zipman')
 source=('msys2-runtime'::git://sourceware.org/git/newlib-cygwin.git#tag=cygwin-${pkgver}
@@ -205,9 +208,11 @@ build() {
   [[ -d "${srcdir}"/build-${MSYSTEM_CARCH} ]] && rm -rf "${srcdir}"/build-${MSYSTEM_CARCH}
   mkdir -p "${srcdir}"/build-${MSYSTEM_CARCH} && cd "${srcdir}"/build-${MSYSTEM_CARCH}
 
-  export PATH="/opt/usr/bin:$PATH"
-  export CC=/opt/usr/bin/gcc.exe
-  export CXX=/opt/usr/bin/g++.exe
+  if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
+    export PATH="/opt/usr/bin:$PATH"
+    export CC=/opt/usr/bin/gcc.exe
+    export CXX=/opt/usr/bin/g++.exe
+  fi
 
   echo ""
   echo "CC [gcc] := ${CC-gcc}"
