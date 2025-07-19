@@ -16,6 +16,7 @@ _install_prefix="${MSYSTEM_PREFIX}"
 ### Major build options
 _enable_bootstrap=no
 _enable_static_libgcc=yes
+_enable_threads=no
 options=('staticlibs' '!emptydirs' '!strip' '!debug')
 #options=('!emptydirs') # '!strip' 'debug')
 ### Language build options
@@ -24,13 +25,18 @@ _enable_fortran=no
 _enable_objc=no
 _enable_jit=no
 # build options not normally changed
-#_threads="posix"            # Use posix for production
+_threads="posix"            # Use posix for production
 _enable_libquadmath=no      # Use no for production
 _enable_libgomp=yes         # Use yes for production
+_enable_libatomic=yes       # Use yes for production
 _enable_graphite=yes        # Use yes for production
 _enable_lto=yes             # Use yes for production
 _enable_system_zlib=yes     # Use yes for production
 # =========================================== #
+if [[ "$_enable_threads" != "yes" || "$_threads" != "posix" ]]; then
+  _enable_libgomp=no
+  _enable_libatomic=no
+fi
 if [[ "$_enable_fortran" == "yes" && "$_enable_libquadmath" != "yes" ]]; then
   warning "when building FORTRAN; libquadmath is enabled"
   _enable_libquadmath=yes
@@ -54,7 +60,7 @@ if [[ "$_enable_static_libgcc" != "yes" ]]; then
   pkgname+=('gcc-libs')
 fi
 pkgver=13.4.1+d20250712.r0.c0.gd3acb727b8f4
-pkgrel=2
+pkgrel=3
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('spdx:GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND GCC-exception-3.1 AND GFDL-1.3-or-later')
@@ -279,6 +285,13 @@ build() {
     _languages+=",jit"
   fi
 
+  if [[ "$_enable_threads" == "yes" && "$_threads" == "posix" ]]; then
+    extra_config+=("--enable-threads=posix")
+  elif [[ "$_enable_threads" == "yes" && "$_threads" == "win32" ]]; then
+    extra_config+=("--enable-threads=win32")
+  else
+    extra_config+=("--enable-threads=single")
+  fi
   if [[ "$_enable_static_libgcc" == "yes" ]]; then
     extra_config+=('--disable-shared')
     extra_config+=('--disable-shared-libgcc')
@@ -320,6 +333,12 @@ build() {
   else
     extra_config+=('--without-system-zlib')
   fi
+  #
+  if [[ "$_enable_libatomic" != "yes" ]]; then
+    extra_config+=('--disable-libatomic')
+  else
+    extra_config+=('--enable-libatomic')
+  fi
 
   echo ""
   echo "CC [gcc] := ${CC-gcc}"
@@ -343,8 +362,6 @@ build() {
     --enable-__cxa_atexit \
     --with-dwarf2 \
     --enable-languages=${_languages} \
-    --enable-threads=posix \
-    --enable-libatomic \
     --disable-libitm \
     --disable-libssp \
     --disable-win32-registry \
