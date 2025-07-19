@@ -8,7 +8,7 @@ _realname='libtool'
 pkgbase=opt-${_realname}-gcc13
 pkgname=('opt-libtool' 'opt-libltdl')
 pkgver=2.5.4
-pkgrel=2
+pkgrel=3
 pkgdesc="A generic library support script"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/libtool"
@@ -21,6 +21,7 @@ makedepends=(
   "automake-wrapper"
   "help2man"
   "m4"
+  'opt-msys2-w32api-runtime'
 )
 if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
   makedepends=('opt-gcc')
@@ -106,7 +107,7 @@ build() {
   ${CC-gcc} --version | head -1
   echo ""
 
-  LDFLAGS+=" -L/usr/lib -L/usr/lib/w32api" \
+  LDFLAGS+=" -L/usr/lib -L${_install_prefix}/lib/w32api" \
   ./configure \
     --build=${CHOST/-msys/-cygwin} \
     --prefix=${_install_prefix} \
