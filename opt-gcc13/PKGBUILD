@@ -57,6 +57,7 @@ _enable_bootstrap=no       # Use yes for production
 _enable_static_libgcc=yes    # Use no for production
 _use_temp_dll_prefix=no     # Use no for production
 _enable_threads=yes
+_use_GMP_etc_ISL_intree=yes # Use yes for production
 options=('staticlibs' '!emptydirs' '!strip' '!debug')
 #options=('!emptydirs') # '!strip' 'debug')
 ### Language build options
@@ -130,6 +131,12 @@ if [[ "$_enable_system_zlib" == "yes" ]]; then
   else
     makedepends+=('opt-zlib-devel')
   fi
+fi
+if [[ "$_use_GMP_etc_ISL_intree" == "no" ]]; then
+  makedepends+=('opt-gmp-static')
+  makedepends+=('opt-mpfr-static')
+  makedepends+=('opt-mpc-static')
+  makedepends+=('opt-isl-static')
 fi
 MPFR_VERSION=4.1.0
 GMP_VERSION=6.2.1
@@ -242,10 +249,16 @@ prepare() {
   time git clean -fdx
 
   cd ${srcdir}
-  _extract_to_gcc_folder            gmp-${GMP_VERSION}.tar.bz2
-  _extract_to_gcc_folder            mpfr-${MPFR_VERSION}.tar.bz2
-  _extract_to_gcc_folder            mpc-${MPC_VERSION}.tar.gz
-  if [[ "$_enable_graphite" == "yes" ]]; then
+  if [[ "$_use_GMP_etc_ISL_intree" == "yes" ]]; then
+    _extract_to_gcc_folder          gmp-${GMP_VERSION}.tar.bz2
+    _extract_to_gcc_folder          mpfr-${MPFR_VERSION}.tar.bz2
+    _extract_to_gcc_folder          mpc-${MPC_VERSION}.tar.gz
+  else
+    rm -fr ${srcdir}/${_sourcedir}/gmp
+    rm -fr ${srcdir}/${_sourcedir}/mpfr
+    rm -fr ${srcdir}/${_sourcedir}/mpc
+  fi
+  if [[ "$_enable_graphite" == "yes" && "$_use_GMP_etc_ISL_intree" == "yes" ]]; then
     _extract_to_gcc_folder          isl-${ISL_VERSION}.tar.bz2
   else
     rm -fr ${srcdir}/${_sourcedir}/isl
@@ -363,6 +376,13 @@ build() {
     _languages+=",jit"
   fi
 
+  if [[ "$_use_GMP_etc_ISL_intree" == "no" ]]; then
+    extra_config+=('--with-gmp=${_install_prefix}')
+    extra_config+=('--with-gmp-include=${_install_prefix}/include')
+    extra_config+=('--with-mpfr=${_install_prefix}')
+    extra_config+=('--with-mpc=${_install_prefix}')
+    extra_config+=('--with-isl=${_install_prefix}')
+  fi
   if [[ "$_enable_threads" == "yes" && "$_threads" == "posix" ]]; then
     extra_config+=("--enable-threads=posix")
   elif [[ "$_enable_threads" == "yes" && "$_threads" == "win32" ]]; then
