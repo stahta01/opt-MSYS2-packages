@@ -495,7 +495,7 @@ package_opt-gcc()
   if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
     depends+=('binutils' 'msys2-runtime-devel' 'msys2-w32api-headers' 'msys2-w32api-runtime')
   else
-    depends+=('opt-binutils' 'opt-msys2-runtime-devel' 'opt-msys2-w32api-headers' 'opt-msys2-w32api-runtime')
+    depends+=('opt-msys2-w32api-headers' 'opt-msys2-w32api-runtime')
   fi
   if [[ "$_enable_static_libgcc" != "yes" ]]; then
     depends+=("opt-gcc-libs=${pkgver}-${pkgrel}")
