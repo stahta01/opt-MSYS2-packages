@@ -315,7 +315,7 @@ build() {
     export CC=/opt/usr/bin/gcc.exe
     export CXX=/opt/usr/bin/g++.exe
     export LD=/opt/usr/bin/ld.exe
-    export LDFLAGS+=" -L/opt/usr/lib/gcc/${CYGWIN_CHOST}/${pkgver%%+*} -L/opt/usr/lib -L${_install_prefix}/lib/w32api  -L/opt/usr/bin"
+    export LDFLAGS+=" -L/opt/usr/lib/gcc/${CYGWIN_CHOST}/${pkgver%%+*} -L/opt/usr/lib -L${_install_prefix}/lib/w32api -L/usr/lib -L/opt/usr/bin"
   #else
     #LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/bin"
   fi
