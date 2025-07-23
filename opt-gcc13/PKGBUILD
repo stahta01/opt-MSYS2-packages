@@ -451,7 +451,7 @@ build() {
     --with-bugurl="https://github.com/stahta01/opt-MSYS2-packages/issues" \
     "${extra_config[@]}"
 
-  make
+  make --jobs=1
 
   # make documentation
   #cd ${CYGWIN_CHOST}/libstdc++-v3
