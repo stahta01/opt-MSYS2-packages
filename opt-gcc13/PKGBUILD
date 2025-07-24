@@ -102,7 +102,7 @@ if [[ "$_enable_static_libgcc" != "yes" ]]; then
   pkgname+=('opt-gcc-libs')
 fi
 pkgver=13.4.1+d20250702.r0.c0.g04a71a35c3d0
-pkgrel=2
+pkgrel=3
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('spdx:GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND GCC-exception-3.1 AND GFDL-1.3-or-later')
@@ -116,7 +116,6 @@ if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
   makedepends+=('gcc')
 else
   makedepends+=('opt-gcc')
-  makedepends+=('opt-binutils')
 fi
 if [[ "$_enable_system_zlib" == "yes" ]]; then
   if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
@@ -292,9 +291,13 @@ build() {
   local CYGWIN_CHOST="${CHOST/-msys/-cygwin}"
 
   if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
-    export PATH="/opt/usr/bin:$PATH"
-    export CC=/opt/usr/bin/gcc.exe
-    export CXX=/opt/usr/bin/g++.exe
+    export CC=/opt/usr/bin/gcc
+    export CXX=/opt/usr/bin/g++
+    export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
+    export LDFLAGS+=" -L/opt/usr/lib/gcc/${CYGWIN_CHOST}/${pkgver%%+*} -L/opt/usr/lib -L${_install_prefix}/lib/w32api -L/usr/lib"
+  else
+    export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
+    export LDFLAGS+=" -L/opt/usr/lib/gcc/${CYGWIN_CHOST}/${pkgver%%+*} -L/opt/usr/lib -L${_install_prefix}/lib/w32api -L/usr/lib"
   fi
 
   echo ""
@@ -397,8 +400,13 @@ build() {
   echo "CC [gcc] := ${CC-gcc}"
   ${CC-gcc} --version | head -1
   ${CC-gcc} --help | tail -1
-  pacman -Q msys2-w32api-headers
-  pacman -Q msys2-w32api-runtime
+  if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+    pacman -Q msys2-w32api-headers
+    pacman -Q msys2-w32api-runtime
+  else
+    pacman -Q opt-msys2-w32api-headers
+    pacman -Q opt-msys2-w32api-runtime
+  fi
   echo ""
 
   ${srcdir}/${_sourcedir}/configure \
