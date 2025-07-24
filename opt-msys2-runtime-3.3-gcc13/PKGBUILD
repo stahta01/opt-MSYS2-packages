@@ -12,7 +12,7 @@ else
   pkgname=('opt-msys2-runtime-3.3' 'opt-msys2-runtime-3.3-devel')
 fi
 pkgver=3.3.6
-pkgrel=1
+pkgrel=2
 pkgdesc="Cygwin POSIX emulation engine"
 arch=('i686' 'x86_64')
 url="https://www.cygwin.com/"
@@ -278,6 +278,9 @@ build() {
     export PATH="/opt/usr/bin:$PATH"
     export CC=/opt/usr/bin/gcc.exe
     export CXX=/opt/usr/bin/g++.exe
+  else
+    export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
+    export LDFLAGS+=" -L/opt/usr/lib -L${_install_prefix}/lib/w32api -L/usr/lib -L/opt/usr/bin"
   fi
 
   echo ""
