@@ -8,7 +8,7 @@ _realname='libtool'
 pkgbase=opt-${_realname}-gcc13
 pkgname=('opt-libtool' 'opt-libltdl')
 pkgver=2.5.4
-pkgrel=4
+pkgrel=5
 pkgdesc="A generic library support script"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/libtool"
@@ -89,14 +89,10 @@ build() {
   cd "${_realname}-${pkgver}"
 
   if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
-    export PATH="/opt/usr/bin:$PATH"
     export CC=/opt/usr/bin/gcc
     export CXX=/opt/usr/bin/g++
-    export LD=/usr/bin/ld
-    #export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
-    export LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/lib/w32api -L/usr/lib -L/opt/usr/bin"
-    #export AR=/opt/usr/bin/ar.exe
-    #export RANLIB=/opt/usr/bin/ranlib.exe
+    export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
+    export LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/lib/w32api -L/usr/lib"
   fi
 
   echo ""
