@@ -327,6 +327,7 @@ _package_msys2-runtime() {
   rm -f "${pkgdir}"${_install_prefix}/bin/cyglsa64.dll
   rm -f "${pkgdir}"${_install_prefix}/bin/cygserver-config
   #cp -rf "${srcdir}"/dest${MSYSTEM_PREFIX}/share "${pkgdir}"${MSYSTEM_PREFIX}/
+  rm -f "${pkgdir}"${_install_prefix}/bin/msys-2.0.dll
 }
 
 package_opt-msys2-runtime-3.3() {
