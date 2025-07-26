@@ -9,7 +9,7 @@ _realname='libiconv'
 pkgbase=opt-${_realname}
 pkgname=('opt-libiconv' 'opt-libiconv-devel')
 pkgver=1.18
-pkgrel=2
+pkgrel=3
 pkgdesc='Libiconv is a conversion library'
 groups=('libraries')
 arch=('i686' 'x86_64')
@@ -78,6 +78,10 @@ build() {
     --enable-static \
     --enable-shared \
     --enable-extra-encodings
+
+  # workaround for build bug likely in configure likely triggered by GCC update
+  sed -i 's|-R/opt/usr/lib||' src/Makefile
+  sed -i 's|-R/opt/usr/lib||' srclib/Makefile
 
   make
   make DESTDIR=${srcdir}/dest install
