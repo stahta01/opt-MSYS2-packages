@@ -108,7 +108,7 @@ if [[ "$_enable_static_libgcc" != "yes" ]]; then
   pkgname+=('opt-gcc-libs')
 fi
 pkgver=13.4.1+d20250725.r0.c0.g069554b780f0
-pkgrel=1
+pkgrel=2
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('spdx:GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND GCC-exception-3.1 AND GFDL-1.3-or-later')
@@ -441,7 +441,6 @@ build() {
     --enable-__cxa_atexit \
     --with-dwarf2 \
     --enable-languages=${_languages} \
-    --enable-libatomic \
     --disable-libitm \
     --disable-libssp \
     --disable-win32-registry \
@@ -451,7 +450,6 @@ build() {
     --enable-checking=release \
     --without-libiconv-prefix \
     --without-libintl-prefix \
-    --with-system-zlib \
     --enable-linker-build-id \
     --enable-libstdcxx-filesystem-ts \
     --with-pkgversion="Rev${pkgrel} ${MSYSTEM} ${MSYSTEM_CARCH}, Built by opt-MSYS2-packages project" \
