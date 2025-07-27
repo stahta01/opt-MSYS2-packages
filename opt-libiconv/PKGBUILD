@@ -3,13 +3,13 @@
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 _use_opt_gettext_devel=no
-_use_static_libgcc=yes
+_use_static_libgcc=no
 
 _realname='libiconv'
 pkgbase=opt-${_realname}
 pkgname=('opt-libiconv' 'opt-libiconv-devel')
 pkgver=1.18
-pkgrel=3
+pkgrel=4
 pkgdesc='Libiconv is a conversion library'
 groups=('libraries')
 arch=('i686' 'x86_64')
