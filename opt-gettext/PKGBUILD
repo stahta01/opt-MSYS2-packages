@@ -2,13 +2,13 @@
 
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
-_use_static_libgcc=yes
+_use_static_libgcc=no
 
 _realname='gettext'
 pkgbase=opt-${_realname}
 pkgname=('opt-gettext' 'opt-gettext-devel' 'opt-libgettextpo' 'opt-libasprintf' 'opt-libintl')
 pkgver=0.22.5
-pkgrel=1
+pkgrel=2
 pkgdesc="GNU internationalization library"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/gettext/"
@@ -99,9 +99,10 @@ prepare() {
 build() {
   cd "${srcdir}/${_realname}-${pkgver}"
 
-  export PATH="/opt/usr/bin:$PATH"
-  export CC=/opt/usr/bin/gcc.exe
-  export CXX=/opt/usr/bin/g++.exe
+  export CC=/opt/usr/bin/gcc
+  export CXX=/opt/usr/bin/g++
+  export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
+  export LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/lib/w32api -L/usr/lib"
 
   echo ""
   echo "CC [gcc] := ${CC-gcc}"
