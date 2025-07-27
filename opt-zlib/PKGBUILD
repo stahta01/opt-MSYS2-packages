@@ -3,13 +3,13 @@
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 _enable_gcc_bootmode=no
-_use_static_libgcc=yes
+_use_static_libgcc=no
 
 _realname=zlib
 pkgbase=opt-${_realname}
 pkgname=('opt-zlib' 'opt-zlib-devel')
 pkgver=1.3.1
-pkgrel=2
+pkgrel=3
 pkgdesc='Compression library implementing the deflate compression method found in gzip and PKZIP'
 arch=('i686' 'x86_64')
 groups=('libraries')
@@ -49,9 +49,13 @@ build() {
   cd ${srcdir}/${_realname}-${pkgver}
 
   if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
-    export PATH="/opt/usr/bin:$PATH"
-    export CC=/opt/usr/bin/gcc.exe
-    export CXX=/opt/usr/bin/g++.exe
+    export CC=/opt/usr/bin/gcc
+    export CXX=/opt/usr/bin/g++
+    export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
+    export LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/lib/w32api -L/usr/lib"
+  else
+    export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
+    export LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/lib/w32api -L/usr/lib"
   fi
 
   echo ""
