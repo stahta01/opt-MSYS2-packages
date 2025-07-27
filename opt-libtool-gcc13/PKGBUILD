@@ -8,7 +8,7 @@ _realname='libtool'
 pkgbase=opt-${_realname}-gcc13
 pkgname=('opt-libtool' 'opt-libltdl')
 pkgver=2.5.4
-pkgrel=5
+pkgrel=6
 pkgdesc="A generic library support script"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/libtool"
@@ -132,7 +132,7 @@ package_opt-libtool() {
 
   install -Dm644 "${srcdir}/${_realname}-${pkgver}/COPYING" -t "${pkgdir}${_install_prefix}/share/licenses/${_realname}"
 
-  sed -i 's|LD="/usr/|LD="/opt/usr/|' ${pkgdir}${_install_prefix}/bin/libtool
+  #sed -i 's|LD="/usr/|LD="/opt/usr/|' ${pkgdir}${_install_prefix}/bin/libtool
   sed -i 's|predep_objects="/usr/|predep_objects="/opt/usr/|' ${pkgdir}${_install_prefix}/bin/libtool
   sed -i 's|postdep_objects="/usr/|postdep_objects="/opt/usr/|' ${pkgdir}${_install_prefix}/bin/libtool
 }
