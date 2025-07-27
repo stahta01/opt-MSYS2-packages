@@ -2,15 +2,15 @@
 
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
-_enable_gcc_bootmode=yes
-_use_static_libgcc=yes
-_enable_system_zlib=no     # Use yes for production
+_use_opt_gcc_to_build=yes
+_use_static_libgcc=no
+_use_intree_zlib=no
 
 _realname=binutils
 pkgbase=opt-${_realname}
 pkgname=opt-${_realname}
 pkgver=2.44
-pkgrel=2
+pkgrel=3
 pkgdesc="A set of programs to assemble and manipulate binary and object files"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/binutils/"
@@ -18,9 +18,14 @@ msys2_references=(
   "cpe: cpe:/a:gnu:binutils"
 )
 license=('GPL')
-depends=('libiconv' 'libintl')
-if [[ "$_enable_system_zlib" == "yes" ]]; then
-  if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+depends=()
+if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
+  depends+=('libiconv' 'libintl')
+else
+  depends+=('opt-libiconv' 'opt-libintl')
+fi
+if [[ "$_use_intree_zlib" != "yes" ]]; then
+  if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
     depends+=('zlib')
   else
     depends+=('opt-zlib')
@@ -28,13 +33,13 @@ if [[ "$_enable_system_zlib" == "yes" ]]; then
 fi
 checkdepends=('dejagnu' 'bc')
 makedepends=('autotools')
-if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
   makedepends+=('gcc')
 else
-  makedepends+=('opt-gcc' 'opt-binutils')
+  makedepends+=('opt-gcc')
 fi
-if [[ "$_enable_system_zlib" == "yes" ]]; then
-  if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+if [[ "$_use_intree_zlib" != "yes" ]]; then
+  if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
     makedepends+=('zlib-devel')
   else
     makedepends+=('opt-zlib-devel')
@@ -72,10 +77,14 @@ build() {
   local CYGWIN_CHOST="${CHOST/-msys/-cygwin}"
   export MSYSTEM=CYGWIN
 
-  if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
-    export PATH="/opt/usr/bin:$PATH"
-    export CC=/opt/usr/bin/gcc.exe
-    export CXX=/opt/usr/bin/g++.exe
+  if [[ "$_use_opt_gcc_to_build" == "yes" ]]; then
+    export CC=/opt/usr/bin/gcc
+    export CXX=/opt/usr/bin/g++
+    export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
+    export LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/lib/w32api -L/usr/lib"
+  else
+    export CFLAGS+=" -I/opt/usr/include/w32api -I/usr/include"
+    export LDFLAGS+=" -L/opt/usr/lib/w32api -L/usr/lib"
   fi
 
   echo ""
@@ -86,18 +95,23 @@ build() {
 
   declare -a extra_config
   extra_config+=('--disable-nls')
-  if [ "$_enable_system_zlib" == "yes" ]; then
+  if [ "$_use_intree_zlib" != "yes" ]; then
     extra_config+=('--with-system-zlib')
   else
     extra_config+=('--without-system-zlib')
+  fi
+  if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
+    extra_config+=('--without-libiconv-prefix')
+    extra_config+=('--without-libintl-prefix')
+  else
+    extra_config+=("--with-libiconv-prefix=${_install_prefix}")
+    extra_config+=("--with-libintl-prefix=${_install_prefix}")
   fi
 
   if [[ "$_use_static_libgcc" == "yes" ]]; then
     export LDFLAGS="-static-libgcc -static-libstdc++"
   fi
 
-  CFLAGS="-I/opt/usr/include -I/opt/usr/include/w32api" \
-  LDFLAGS+=" -nodefaultlibs -L/opt/usr/lib -L/opt/usr/lib/w32api -lcygwin" \
   cd "${srcdir}"/binutils-${CARCH}
   ../binutils-${pkgver}/configure \
     --prefix=${_install_prefix} \
@@ -107,8 +121,6 @@ build() {
     --disable-sim \
     --enable-64-bit-bfd \
     --enable-install-libiberty \
-    --without-libiconv-prefix \
-    --without-libintl-prefix \
     "${extra_config[@]}"
 
   make
