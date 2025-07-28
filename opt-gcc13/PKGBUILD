@@ -13,8 +13,8 @@
 ##
 # I.    Shared build Mode using gcc from step 0A or 1B
 #  toolchain initial build order part 1A: opt-msys2-w32api-headers opt-msys2-w32api-runtime
-# Set _enable_gcc_bootmode to yes in step 1B
-# Set _enable_system_zlib to no in step 1B
+# Set _use_opt_gcc_to_build to no in step 1B
+# Set _use_intree_zlib to yes in step 1B
 # Set _enable_static_libgcc to no in step 1B
 #  toolchain initial build order step 1B: opt-gcc13
 #  toolchain initial build order step 1C: opt-libtool-gcc13
@@ -38,11 +38,12 @@
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 ### Major build options
-_enable_gcc_bootmode=yes   # Use no for production; yes to use normal GCC to build
+_use_opt_gcc_to_build=no   # Use yes for production
+_use_intree_zlib=yes         # Use no for production
 _enable_bootstrap=no       # Use yes for production
+_enable_threads=yes         # Use yes for production
 _enable_static_libgcc=no    # Use no for production
 _use_temp_dll_prefix=no     # Use no for production
-_enable_threads=yes
 options=('staticlibs' '!emptydirs' '!strip' '!debug')
 #options=('!emptydirs') # '!strip' 'debug')
 ### Language build options
@@ -57,7 +58,6 @@ _enable_libgomp=yes         # Use yes for production
 _enable_libatomic=yes       # Use yes for production
 _enable_graphite=yes        # Use yes for production
 _enable_lto=yes             # Use yes for production
-_enable_system_zlib=no     # Use yes for production
 # =========================================== #
 if [[ "$_enable_threads" != "yes" || "$_threads" != "posix" ]]; then
   _enable_libgomp=no
@@ -75,12 +75,12 @@ if [[ "$_enable_static_libgcc" == "yes" && "$_enable_libgomp" != "no" ]]; then
   warning "when building static GCC; libgomp is disabled"
   _enable_libgomp=no
 fi
-if [[ "$_enable_gcc_bootmode" == "yes" && "$_enable_lto" != "no" ]]; then
-  warning "when building _enable_gcc_bootmode GCC; LTO is disabled"
+if [[ "$_use_opt_gcc_to_build" == "no" && "$_enable_lto" != "no" ]]; then
+  warning "when building _use_opt_gcc_to_build=no GCC; LTO is disabled"
   _enable_lto=no
 fi
-if [[ "$_enable_gcc_bootmode" == "yes" && "$_enable_libgomp" != "no" ]]; then
-  warning "when building _enable_gcc_bootmode GCC; libgomp is disabled"
+if [[ "$_use_opt_gcc_to_build" != "yes" && "$_enable_libgomp" != "no" ]]; then
+  warning "when building _use_opt_gcc_to_build=no GCC; libgomp is disabled"
   _enable_libgomp=no
 fi
 # =========================================== #
@@ -94,7 +94,7 @@ if [[ "$_enable_static_libgcc" != "yes" ]]; then
   pkgname+=('opt-gcc-libs')
 fi
 pkgver=13.4.1+d20250725.r0.c0.g069554b780f0
-pkgrel=3
+pkgrel=4
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('spdx:GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND GCC-exception-3.1 AND GFDL-1.3-or-later')
@@ -104,13 +104,13 @@ msys2_references=(
 )
 makedepends=('autotools' 'git'
              'windows-default-manifest' 'gperf')
-if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
   makedepends+=('gcc')
 else
   makedepends+=('opt-gcc')
 fi
-if [[ "$_enable_system_zlib" == "yes" ]]; then
-  if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+if [[ "$_use_intree_zlib" != "yes" ]]; then
+  if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
     makedepends+=('zlib-devel')
   else
     makedepends+=('opt-zlib-devel')
@@ -282,7 +282,7 @@ build() {
 
   local CYGWIN_CHOST="${CHOST/-msys/-cygwin}"
 
-  if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
+  if [[ "$_use_opt_gcc_to_build" == "yes" ]]; then
     export CC=/opt/usr/bin/gcc
     export CXX=/opt/usr/bin/g++
     export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
@@ -389,7 +389,7 @@ build() {
     extra_config+=('--disable-graphite')
   fi
   #
-  if [ "$_enable_system_zlib" == "yes" ]; then
+  if [ "$_use_intree_zlib" != "yes" ]; then
     extra_config+=('--with-system-zlib')
   else
     extra_config+=('--without-system-zlib')
@@ -405,7 +405,7 @@ build() {
   echo "CC [gcc] := ${CC-gcc}"
   ${CC-gcc} --version | head -1
   ${CC-gcc} --help | tail -1
-  if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+  if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
     pacman -Q msys2-w32api-headers
     pacman -Q msys2-w32api-runtime
   else
@@ -502,7 +502,7 @@ package_opt-gcc()
 {
   pkgdesc="The GNU Compiler Collection - C and C++ frontends"
   depends=('windows-default-manifest')
-  if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+  if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
     depends+=('binutils' 'msys2-runtime-devel' 'msys2-w32api-headers' 'msys2-w32api-runtime')
   else
     depends+=('opt-msys2-w32api-headers' 'opt-msys2-w32api-runtime')
@@ -510,8 +510,8 @@ package_opt-gcc()
   if [[ "$_enable_static_libgcc" != "yes" ]]; then
     depends+=("opt-gcc-libs=${pkgver}-${pkgrel}")
   fi
-  if [[ "$_enable_system_zlib" == "yes" ]]; then
-    if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
+  if [[ "$_use_intree_zlib" != "yes" ]]; then
+    if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
       depends+=('zlib')
     else
       depends+=('opt-zlib')
