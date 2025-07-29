@@ -3,13 +3,12 @@
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 _use_opt_gettext_devel=no
-_use_static_libgcc=no
 
 _realname='libiconv'
 pkgbase=opt-${_realname}
 pkgname=('opt-libiconv' 'opt-libiconv-devel')
 pkgver=1.18
-pkgrel=4
+pkgrel=5
 pkgdesc='Libiconv is a conversion library'
 groups=('libraries')
 arch=('i686' 'x86_64')
@@ -93,9 +92,11 @@ check() {
 }
 
 package_opt-libiconv() {
-  depends=('libintl')
-  if [[ "$_use_static_libgcc" != "yes" ]]; then
-    depends+=('opt-gcc-libs')
+  depends=('opt-gcc-libs')
+  if [[ "$_use_opt_gettext_devel" == "yes" ]]; then
+    depends+=('opt-libintl')
+  else
+    depends+=('libintl')
   fi
 
   mkdir -p ${pkgdir}${_install_prefix}
