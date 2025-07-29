@@ -2,13 +2,11 @@
 
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
-_use_static_libgcc=no
-
 _realname='gettext'
 pkgbase=opt-${_realname}
 pkgname=('opt-gettext' 'opt-gettext-devel' 'opt-libgettextpo' 'opt-libasprintf' 'opt-libintl')
 pkgver=0.22.5
-pkgrel=2
+pkgrel=3
 pkgdesc="GNU internationalization library"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/gettext/"
@@ -179,10 +177,7 @@ package_opt-gettext-devel() {
 package_opt-libintl() {
   pkgdesc="GNU Internationalization runtime library"
   groups=('libraries')
-  depends=('opt-libiconv')
-  if [[ "$_use_static_libgcc" != "yes" ]]; then
-    depends+=('opt-gcc-libs')
-  fi
+  depends=('opt-libiconv' 'opt-gcc-libs')
 
   mkdir -p ${pkgdir}${_install_prefix}/bin
   cp -f ${srcdir}/dest${_install_prefix}/bin/msys-intl-8.dll ${pkgdir}${_install_prefix}/bin/
@@ -191,9 +186,7 @@ package_opt-libintl() {
 package_opt-libgettextpo() {
   pkgdesc="GNU Internationalization runtime library"
   groups=('libraries')
-  if [[ "$_use_static_libgcc" != "yes" ]]; then
-    depends=('opt-gcc-libs')
-  fi
+  depends=('opt-gcc-libs')
 
   mkdir -p ${pkgdir}${_install_prefix}/bin
   cp -f ${srcdir}/dest${_install_prefix}/bin/msys-gettextpo-0.dll ${pkgdir}${_install_prefix}/bin/
@@ -202,9 +195,7 @@ package_opt-libgettextpo() {
 package_opt-libasprintf() {
   pkgdesc="C-style formatted output in C++ (runtime)"
   groups=('libraries')
-  if [[ "$_use_static_libgcc" != "yes" ]]; then
-    depends=('opt-gcc-libs')
-  fi
+  depends=('opt-gcc-libs')
 
   mkdir -p ${pkgdir}${_install_prefix}/bin
   cp -f ${srcdir}/dest${_install_prefix}/bin/msys-asprintf-0.dll ${pkgdir}${_install_prefix}/bin/
