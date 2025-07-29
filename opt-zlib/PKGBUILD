@@ -3,13 +3,12 @@
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 _enable_gcc_bootmode=no
-_use_static_libgcc=no
 
 _realname=zlib
 pkgbase=opt-${_realname}
 pkgname=('opt-zlib' 'opt-zlib-devel')
 pkgver=1.3.1
-pkgrel=3
+pkgrel=4
 pkgdesc='Compression library implementing the deflate compression method found in gzip and PKZIP'
 arch=('i686' 'x86_64')
 groups=('libraries')
@@ -93,7 +92,7 @@ check() {
 package_opt-zlib() {
 if [[ "$_enable_gcc_bootmode" == "yes" ]]; then
   depends=('gcc-libs')
-elif [[ "$_use_static_libgcc" != "yes" ]]; then
+else
   depends=('opt-gcc-libs')
 fi
 
