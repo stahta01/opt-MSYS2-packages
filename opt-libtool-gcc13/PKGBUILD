@@ -2,13 +2,11 @@
 
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
-_enable_gcc_bootmode=no
-
 _realname='libtool'
 pkgbase=opt-${_realname}-gcc13
 pkgname=('opt-libtool' 'opt-libltdl')
 pkgver=2.5.4
-pkgrel=6
+pkgrel=7
 pkgdesc="A generic library support script"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/libtool"
@@ -23,11 +21,8 @@ makedepends=(
   "m4"
   'opt-msys2-w32api-runtime'
 )
-if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
-  makedepends=('opt-gcc')
-else
-  makedepends=('gcc13')
-fi
+makedepends=('opt-gcc13')
+
 source=(https://ftp.gnu.org/gnu/libtool/${_realname}-${pkgver}.tar.xz{,.sig}
         0001-cygwin-mingw-Create-UAC-manifest-files.patch
         0002-Fix-seems-to-be-moved.patch
@@ -88,12 +83,10 @@ prepare() {
 build() {
   cd "${_realname}-${pkgver}"
 
-  if [[ "$_enable_gcc_bootmode" != "yes" ]]; then
-    export CC=/opt/usr/bin/gcc
-    export CXX=/opt/usr/bin/g++
-    export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
-    export LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/lib/w32api -L/usr/lib"
-  fi
+  export CC=/opt/usr/bin/gcc
+  export CXX=/opt/usr/bin/g++
+  export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
+  export LDFLAGS+=" -L/opt/usr/lib -L/opt/usr/lib/w32api -L/usr/lib"
 
   echo ""
   echo "PATH := $PATH"
@@ -104,14 +97,13 @@ build() {
   ${CC-gcc} --version | head -1
   echo ""
 
-  LDFLAGS+=" -L/usr/lib -L${_install_prefix}/lib/w32api" \
   ./configure \
     --build=${CHOST/-msys/-cygwin} \
     --prefix=${_install_prefix} \
     lt_cv_sys_lib_dlsearch_path_spec="${_install_prefix}/lib /usr/lib /lib" \
     lt_cv_sys_lib_search_path_spec="${_install_prefix}/lib/gcc/x86_64-pc-cygwin/13.4.1 ${_install_prefix}/x86_64-pc-cygwin/lib ${_install_prefix}/lib /usr/lib ${_install_prefix}/lib/w32api"
 
-  make --jobs=1 V=1
+  make # --jobs=1 V=1
 }
 
 check() {
