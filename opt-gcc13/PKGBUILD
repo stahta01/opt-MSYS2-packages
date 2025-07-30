@@ -98,12 +98,12 @@ _realname=gcc
 _sourcedir=${_realname}-git
 _basever=13 # git branch uses this
 pkgbase=opt-${_realname}${_basever}
-pkgname=('opt-gcc')
+pkgname=('opt-gcc13')
 if [[ "$_enable_static_libgcc" != "yes" ]]; then
-  pkgname+=('opt-gcc-libs')
+  pkgname+=('opt-gcc13-libs')
 fi
 pkgver=13.4.1+d20250725.r0.c0.g069554b780f0
-pkgrel=7
+pkgrel=8
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('spdx:GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND GCC-exception-3.1 AND GFDL-1.3-or-later')
@@ -466,9 +466,11 @@ build() {
 #  ${srcdir}/${_sourcedir}/contrib/test_summary
 #}
 
-package_opt-gcc-libs()
+package_opt-gcc13-libs()
 {
   pkgdesc="Runtime libraries shipped by GCC"
+  provides=(opt-gcc-libs)
+  conflicts=(opt-gcc-libs)
 
   local CYGWIN_CHOST="${CHOST/-msys/-cygwin}"
 
@@ -507,9 +509,11 @@ package_opt-gcc-libs()
     ${pkgdir}${_install_prefix}/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION
 }
 
-package_opt-gcc()
+package_opt-gcc13()
 {
   pkgdesc="The GNU Compiler Collection - C and C++ frontends"
+  provides=(opt-gcc)
+  conflicts=(opt-gcc)
   depends=('windows-default-manifest')
   if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
     depends+=('binutils' 'msys2-runtime-devel' 'msys2-w32api-headers' 'msys2-w32api-runtime')
@@ -517,7 +521,7 @@ package_opt-gcc()
     depends+=('opt-msys2-w32api-headers' 'opt-msys2-w32api-runtime')
   fi
   if [[ "$_enable_static_libgcc" != "yes" ]]; then
-    depends+=("opt-gcc-libs=${pkgver}-${pkgrel}")
+    depends+=("opt-gcc13-libs=${pkgver}-${pkgrel}")
   fi
   if [[ "$_use_intree_zlib" != "yes" ]]; then
     if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
