@@ -103,7 +103,7 @@ if [[ "$_enable_static_libgcc" != "yes" ]]; then
   pkgname+=('opt-gcc-libs')
 fi
 pkgver=13.4.1+d20250725.r0.c0.g069554b780f0
-pkgrel=6
+pkgrel=7
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('spdx:GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND GCC-exception-3.1 AND GFDL-1.3-or-later')
@@ -297,8 +297,8 @@ build() {
     export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
     export LDFLAGS+=" -L/opt/usr/lib/gcc/${CYGWIN_CHOST}/${pkgver%%+*} -L/opt/usr/lib -L${_install_prefix}/lib/w32api -L/usr/lib"
   else
-    export CFLAGS+=" -I/opt/usr/include -I/opt/usr/include/w32api -I/usr/include"
-    export LDFLAGS+=" -L/opt/usr/lib/gcc/${CYGWIN_CHOST}/${pkgver%%+*} -L/opt/usr/lib -L${_install_prefix}/lib/w32api -L/usr/lib"
+    export CFLAGS+=" -I/opt/usr/include/w32api -I/usr/include"
+    export LDFLAGS+=" -L${_install_prefix}/lib/w32api -L/usr/lib"
   fi
 
   echo ""
