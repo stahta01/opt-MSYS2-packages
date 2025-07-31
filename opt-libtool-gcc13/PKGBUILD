@@ -6,7 +6,7 @@ _realname='libtool'
 pkgbase=opt-${_realname}-gcc13
 pkgname=('opt-libtool' 'opt-libltdl')
 pkgver=2.5.4
-pkgrel=7
+pkgrel=8
 pkgdesc="A generic library support script"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/libtool"
@@ -20,8 +20,8 @@ makedepends=(
   "help2man"
   "m4"
   'opt-msys2-w32api-runtime'
+  'opt-gcc13'
 )
-makedepends=('opt-gcc13')
 
 source=(https://ftp.gnu.org/gnu/libtool/${_realname}-${pkgver}.tar.xz{,.sig}
         0001-cygwin-mingw-Create-UAC-manifest-files.patch
@@ -113,7 +113,7 @@ check() {
 }
 
 package_opt-libtool() {
-  depends=("bash" "opt-libltdl=${pkgver}")
+  depends=("bash" "opt-libltdl=${pkgver}" 'opt-gcc13')
 
   cd "${_realname}-${pkgver}"
 
