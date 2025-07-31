@@ -47,9 +47,9 @@
 _install_prefix="/opt${MSYSTEM_PREFIX}"
 
 ### Major build options
-_use_opt_gcc_to_build=no   # Use yes for production
+_use_opt_gcc_to_build=yes   # Use yes for production
 _use_intree_zlib=no         # Use no for production
-_enable_bootstrap=no       # Use yes for production
+_enable_bootstrap=yes       # Use yes for production
 _enable_threads=yes         # Use yes for production
 _enable_static_libgcc=no    # Use no for production
 _use_temp_dll_prefix=no     # Use no for production
@@ -102,8 +102,8 @@ pkgname=('opt-gcc13')
 if [[ "$_enable_static_libgcc" != "yes" ]]; then
   pkgname+=('opt-gcc13-libs')
 fi
-pkgver=13.4.1+d20250725.r0.c0.g069554b780f0
-pkgrel=8
+pkgver=13.4.1+d20250731.r3.c0.g1afe5101b179
+pkgrel=2
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 license=('spdx:GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.1-or-later AND LGPL-3.0-or-later AND GCC-exception-3.1 AND GFDL-1.3-or-later')
@@ -122,7 +122,7 @@ if [[ "$_use_intree_zlib" != "yes" ]]; then
   if [[ "$_use_opt_gcc_to_build" != "yes" ]]; then
     makedepends+=('zlib-devel')
   else
-    makedepends+=('opt-zlib-devel')
+    makedepends+=('opt-zlib-devel' 'opt-msys2-w32api-runtime')
   fi
 fi
 MPFR_VERSION=4.1.0
