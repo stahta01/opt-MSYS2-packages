@@ -4,7 +4,7 @@ _realname=libtool
 pkgbase=${_realname}-gcc13
 pkgname=('libtool-gcc13' 'libltdl-gcc13')
 pkgver=2.5.4
-pkgrel=2
+pkgrel=3
 pkgdesc="A generic library support script"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/libtool"
@@ -94,7 +94,7 @@ check() {
 package_libtool-gcc13() {
   provides=('libtool')
   conflicts=('libtool')
-  depends=("bash" "libltdl-gcc13=${pkgver}")
+  depends=("bash" "libltdl-gcc13=${pkgver}" 'gcc13')
 
   cd "${_realname}-${pkgver}"
 
