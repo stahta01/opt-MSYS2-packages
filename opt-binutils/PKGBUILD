@@ -117,7 +117,7 @@ build() {
     --without-libintl-prefix \
     "${extra_config[@]}"
 
-  make
+  make --jobs=1
 }
 
 check() {
